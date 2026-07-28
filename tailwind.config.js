@@ -4,7 +4,40 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ["'Noto Serif SC'", "'Songti SC'", "serif"],
+        sans: ["'Noto Sans SC'", "'PingFang SC'", "sans-serif"],
+        display: ["'Space Grotesk'", "'Noto Sans SC'", "sans-serif"],
+        mono: ["'JetBrains Mono'", "monospace"],
+      },
       colors: {
+        abyss: "#05080F",
+        ink: {
+          900: "#0A0F1D",
+          850: "#0D1424",
+          800: "#111A2E",
+          700: "#1B2942",
+        },
+        line: "rgba(148,163,184,0.12)",
+        "line-strong": "rgba(148,163,184,0.24)",
+        paper: "#EDF2F9",
+        mist: "#9AA8BF",
+        dim: "#5C6B84",
+        solar: {
+          300: "#F8CF6A",
+          400: "#F2B33D",
+          500: "#DE921F",
+        },
+        volt: {
+          300: "#5EECD4",
+          400: "#2CE0BE",
+          500: "#13BFA0",
+        },
+        danger: "#F2604C",
+        success: "#34D399",
+        storage: "#7A8CFF",
+        hydrogen: "#5EECD4",
+        nuclear: "#F2994A",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
