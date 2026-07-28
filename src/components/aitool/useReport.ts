@@ -1,0 +1,150 @@
+import { useCallback, useRef, useState } from 'react'
+import type { FinancialMetrics, ProjectParams, ProjectType } from './finance'
+
+export type ReportStatus = 'idle' | 'streaming' | 'done' | 'error'
+
+export interface ReportState {
+  status: ReportStatus
+  /** 已拼接的 Markdown 全文 */
+  content: string
+  /** 从报告末尾解析的评级（A+/A/B/C），无则 null */
+  rating: string | null
+  error: string | null
+  generatedAt: Date | null
+  generate: (type: ProjectType, params: ProjectParams, metrics: FinancialMetrics) => void
+}
+
+/** 错误码 → 友好提示 */
+function friendlyError(status: number, fallback: string): string {
+  if (status === 429) return '已达到今日免费评估次数上限（20 次/日），请明天再试'
+  if (status === 503) return 'AI 服务未配置（服务端缺少 DEEPSEEK_API_KEY），请稍后再试'
+  if (status === 502) return 'AI 上游服务暂时不可用，请稍后重试'
+  return fallback || 'AI 服务暂时繁忙，请稍后重试'
+}
+
+/** 从 Markdown 报告解析评级：优先 A+/A/B/C 徽章，其次中文评级映射 */
+export function parseRating(md: string): string | null {
+  const tail = md.slice(-1500)
+  const m = tail.match(/评级[】\]：:】]?\s*[`*_]*\**\s*(A\+|A|B|C)(?![a-zA-Z])/i)
+  if (m) return m[1].toUpperCase()
+  const badge = tail.match(/^\s*#+\s*(?:综合评级|评级)[^\n]*?\b(A\+|A|B|C)\b/im)
+  if (badge) return badge[1].toUpperCase()
+  if (tail.includes('强烈关注')) return 'A+'
+  if (tail.includes('可关注')) return 'A'
+  if (tail.includes('谨慎')) return 'B'
+  if (tail.includes('回避')) return 'C'
+  return null
+}
+
+/**
+ * AI 投资解读报告 — SSE 流式生成（POST /api/ai/report，OpenAI 兼容 SSE）
+ * 逐行解析 data: {...}，拼接 choices[0].delta.content，data: [DONE] 结束
+ */
+export function useAiReport(): ReportState {
+  const [status, setStatus] = useState<ReportStatus>('idle')
+  const [content, setContent] = useState('')
+  const [rating, setRating] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [generatedAt, setGeneratedAt] = useState<Date | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const generate = useCallback(
+    (projectType: ProjectType, params: ProjectParams, metrics: FinancialMetrics) => {
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      setStatus('streaming')
+      setContent('')
+      setRating(null)
+      setError(null)
+      setGeneratedAt(new Date())
+
+      void (async () => {
+        try {
+          const res = await fetch('/api/ai/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              projectType,
+              params,
+              metrics: {
+                equityIRR: metrics.equityIRR,
+                projectIRR: metrics.projectIRR,
+                lcoe: metrics.lcoe,
+                dynamicPayback: metrics.dynamicPayback,
+                staticPayback: metrics.staticPayback,
+                npv: metrics.npv,
+                capex: metrics.capex,
+                equity: metrics.equity,
+                loan: metrics.loan,
+                firstYearGeneration: metrics.firstYearGeneration,
+                totalGeneration: metrics.totalGeneration,
+                operationYears: metrics.operationYears,
+                sensitivity: metrics.sensitivity,
+              },
+            }),
+            signal: controller.signal,
+          })
+
+          if (!res.ok) {
+            let serverMsg = ''
+            try {
+              const data = (await res.json()) as { error?: string }
+              serverMsg = data.error ?? ''
+            } catch {
+              /* ignore */
+            }
+            throw new Error(friendlyError(res.status, serverMsg))
+          }
+          if (!res.body) throw new Error('AI 服务返回异常，请稍后重试')
+
+          const reader = res.body.getReader()
+          const decoder = new TextDecoder()
+          let buffer = ''
+          let acc = ''
+
+          for (;;) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const frames = buffer.split('\n\n')
+            buffer = frames.pop() ?? ''
+            for (const frame of frames) {
+              for (const line of frame.split('\n')) {
+                const trimmed = line.trim()
+                if (!trimmed.startsWith('data:')) continue
+                const payload = trimmed.slice(5).trim()
+                if (payload === '[DONE]') continue
+                try {
+                  const json = JSON.parse(payload) as {
+                    choices?: { delta?: { content?: string } }[]
+                  }
+                  const delta = json.choices?.[0]?.delta?.content
+                  if (delta) {
+                    acc += delta
+                    setContent(acc)
+                  }
+                } catch {
+                  /* 非 JSON 帧（如注释心跳），忽略 */
+                }
+              }
+            }
+          }
+
+          if (!acc.trim()) throw new Error('AI 未返回有效内容，请重试')
+          setContent(acc)
+          setRating(parseRating(acc))
+          setStatus('done')
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') return
+          setError(e instanceof Error ? e.message : 'AI 服务暂时繁忙，请稍后重试')
+          setStatus('error')
+        }
+      })()
+    },
+    [],
+  )
+
+  return { status, content, rating, error, generatedAt, generate }
+}
