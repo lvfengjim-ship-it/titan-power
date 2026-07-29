@@ -2,7 +2,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --include=dev
+RUN npm config set registry https://registry.npmmirror.com && npm ci --no-audit --include=dev
 COPY . .
 RUN npm run build
 
@@ -12,7 +12,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 # 全量依赖（drizzle-kit migrate 启动时迁移数据库需要 devDeps）
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --include=dev
+RUN npm config set registry https://registry.npmmirror.com && npm ci --no-audit --include=dev
 COPY --from=build /app/dist ./dist
 COPY db ./db
 COPY drizzle.config.ts tsconfig.server.json ./
