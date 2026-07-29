@@ -1,23 +1,9 @@
-# ── Stage 1: build ─────────────────────────────────────────────
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm config set registry https://registry.npmmirror.com && npm ci --no-audit --include=dev
-COPY . .
-RUN npm run build
-
-# ── Stage 2: runtime ───────────────────────────────────────────
+# 预构建运行时镜像：无需 npm install，直接运行编译产物
 FROM node:20-alpine
 WORKDIR /app
 ENV NODE_ENV=production
-# 全量依赖（drizzle-kit migrate 启动时迁移数据库需要 devDeps）
-COPY package.json package-lock.json ./
-RUN npm config set registry https://registry.npmmirror.com && npm ci --no-audit --include=dev
-COPY --from=build /app/dist ./dist
+COPY dist ./dist
 COPY db ./db
-COPY drizzle.config.ts tsconfig.server.json ./
-COPY api ./api
-COPY contracts ./contracts
 EXPOSE 3000
-# 启动时先应用数据库迁移（幂等），再启动生产服务器
-CMD ["sh", "-c", "npm run db:migrate && npm start"]
+# 数据库迁移在启动时由 boot.js 自动执行（幂等）
+CMD ["node", "dist/boot.js"]

@@ -32,6 +32,16 @@ if (env.isProduction) {
   const { serveStaticFiles } = await import("./lib/vite");
   serveStaticFiles(app);
 
+  // 启动时自动应用数据库迁移（幂等，无需 drizzle-kit）
+  try {
+    const { migrate } = await import("drizzle-orm/mysql2/migrator");
+    const { getDb } = await import("./queries/connection");
+    await migrate(getDb(), { migrationsFolder: "./db/migrations" });
+    console.log("[db] migrations applied");
+  } catch (e) {
+    console.error("[db] migration failed:", (e as Error).message);
+  }
+
   scheduleVideoFetch();
 
   const port = parseInt(process.env.PORT || "3000");
