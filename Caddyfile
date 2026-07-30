@@ -1,6 +1,12 @@
 # titan-power.cn 生产配置 —— Caddy 自动签发/续期 Let's Encrypt 证书
 # 前提：DNS A 记录 titan-power.cn 与 www.titan-power.cn 已指向本服务器，80/443 已放行
 
+{
+	email admin@titan-power.cn
+	# 强制使用 Let's Encrypt 正式环境（默认若落入 staging，浏览器不信任）
+	acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
 www.titan-power.cn {
 	redir https://titan-power.cn{uri} permanent
 }
