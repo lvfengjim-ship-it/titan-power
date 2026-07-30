@@ -17,7 +17,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3100:3000"
     environment:
       DATABASE_URL: mysql://root:titan_root_change_me@mysql:3306/titan
       APP_ID: titan-power
