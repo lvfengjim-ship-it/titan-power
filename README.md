@@ -1,73 +1,27 @@
-# React + TypeScript + Vite
+# 彭田环保 PT MOMENTUM — titan-power.cn
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+海南彭田环保科技有限公司官网：分布式光伏、分布式风电、工商业储能/独立储能电站的投资、并购与运营。
 
-Currently, two official plugins are available:
+## 功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **AI 投资评估工具**（/ai-tool）：光伏 / 风电 / 储能 / 光储一体化项目参数录入 → 前端财务测算（IRR / LCOE / NPV / 动态回收期，分布式光伏支持自用电价+上网电价双电价模型）→ DeepSeek 流式生成 AI 投资解读报告（每 IP 每日 20 次）
+- **前沿技术洞察**（/insights）：每日自动抓取海外公开渠道前沿能源技术视频（核能 SMR/聚变、氢能、液流/固态电池、钙钛矿等）+ DeepSeek 中文解读，附来源与版权说明
+- 公众号 / 视频号入口（二维码占位，申请中）
+- 联系表单留资（tRPC 入库）
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19 + Vite + Tailwind + shadcn/ui ｜ Hono + tRPC + Drizzle + MySQL ｜ DeepSeek API（OpenAI 兼容协议）
 
-## Expanding the ESLint configuration
+## 部署（Mac Studio）
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+仓库内含预编译 `dist/` 产物，无需 npm install：
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+printf 'DEEPSEEK_API_KEY=sk-xxx\nYOUTUBE_API_KEY=\n' > .env
+docker compose up -d --build   # 访问 http://localhost:3100
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+日常更新：`git pull && docker compose up -d --build`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+详见 DEPLOY.md。
