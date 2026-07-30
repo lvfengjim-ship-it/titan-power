@@ -25,6 +25,7 @@ const TONE: Record<ProjectType, 'gold' | 'volt' | 'storage'> = {
   pv: 'gold',
   wind: 'volt',
   storage: 'storage',
+  pvStorage: 'gold',
 }
 
 interface Props {

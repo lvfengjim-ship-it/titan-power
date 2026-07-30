@@ -4,19 +4,34 @@
  * 口径约定（与 ai-tool.md 一致）：
  * - 金额单位：万元（10k CNY）；能量单位：MWh；容量单位：MW
  * - 年发电量 E_t = 容量 × 利用小时 × (1-衰减率)^(t-1) × PR（风电无 PR 项）
+ * - 分布式光伏（自发自用+余电上网）：收入 = E_t × [自用比例 × 自用电价 + (1-自用比例) × 上网电价]
  * - 储能：放电量 = 能量容量 × 等效满充放次数 × (1-容量衰减)^(t-1)
+ * - 光伏+储能一体化（简化口径）：
+ *   · 光伏收入同纯光伏口径；投资 = PV 投资 + 储能投资，现金流合并计算
+ *   · 储能收入 = 储能年放电量 × 峰谷价差；储能年放电量 = 容量 MWh × 年循环次数 × 充放效率
+ *   · 储能充电成本 = 储能年充电量（放电量/效率）× 上网电价（机会成本口径，视为用余电充电），从储能收入中扣除
  * - 成本：运维 + 土地租金 + 保险（造价 × 0.25%/年）
  * - 融资：等额本息；所得税 25%，「三免三减半」= 前 3 年免征、第 4–6 年减半
  * - 增值税即征即退 50%（可选开关，风电默认开）：按收入 × 13% × 50% 计入其他收益
  * - IRR：二分迭代（项目全投资 IRR 与资本金 IRR）；LCOE 折现率 = 贷款利率；NPV 折现率 = 8%
+ * - 最小规模约束（UI 同步钳制）：光伏 ≥0.5 MW；储能功率 ≥0.5 MW；风电 ≥6 MW
  */
 
-export type ProjectType = 'pv' | 'wind' | 'storage'
+export type ProjectType = 'pv' | 'wind' | 'storage' | 'pvStorage'
 
 export const PROJECT_TYPE_LABEL: Record<ProjectType, string> = {
   pv: '光伏',
   wind: '风电',
   storage: '储能',
+  pvStorage: '光伏+储能一体化',
+}
+
+/** 各类型最小装机规模（MW），滑块与数字输入共用 */
+export const MIN_CAPACITY_MW: Record<ProjectType, number> = {
+  pv: 0.5,
+  wind: 6,
+  storage: 0.5,
+  pvStorage: 0.5,
 }
 
 export interface ProjectParams {
@@ -30,15 +45,31 @@ export interface ProjectParams {
   degradation: number
   /** 系统效率 PR %（光伏）/ 充放效率 %（储能），风电不使用 */
   efficiency: number
-  /** 上网电价 元/kWh（光伏/风电） */
+  /** 上网电价 元/kWh（光伏余电上网/风电；光储亦用作储能充电机会成本） */
   tariff: number
+  /** 客户自用电价 元/kWh（分布式光伏/光储，自发自用部分） */
+  selfUseTariff: number
+  /** 自用比例 %（0–100；上网比例 = 100 − 自用比例） */
+  selfUseRatio: number
   /** 电价年增长率 % */
   tariffGrowth: number
   /** 容量租赁收入 元/kW·年（储能） */
   capacityLease: number
   /** 辅助服务/现货套利价差 元/kWh（储能） */
   arbitrageSpread: number
-  /** 单位造价 元/W（光伏/风电）或 元/Wh（储能） */
+  /** 储能功率 MW（光储一体化） */
+  storagePowerMW: number
+  /** 储能容量 MWh（光储一体化） */
+  storageEnergyMWh: number
+  /** 储能年循环次数 次/年（光储一体化） */
+  storageCycles: number
+  /** 储能充放效率 %（光储一体化） */
+  storageEfficiency: number
+  /** 储能单位造价 元/Wh（光储一体化） */
+  storageUnitCapex: number
+  /** 峰谷价差 元/kWh（光储一体化储能收入） */
+  peakValleySpread: number
+  /** 单位造价 元/W（光伏/风电/光储 PV 部分）或 元/Wh（纯储能） */
   unitCapex: number
   /** 年运维成本 元/W·年（光伏/风电）或 元/Wh·年（储能） */
   omCost: number
@@ -68,9 +99,17 @@ export const PRESETS: Record<ProjectType, ProjectParams> = {
     degradation: 0.5,
     efficiency: 82,
     tariff: 0.35,
+    selfUseTariff: 0.75,
+    selfUseRatio: 80,
     tariffGrowth: 0,
     capacityLease: 180,
     arbitrageSpread: 0.45,
+    storagePowerMW: 2,
+    storageEnergyMWh: 4,
+    storageCycles: 300,
+    storageEfficiency: 88,
+    storageUnitCapex: 1.1,
+    peakValleySpread: 0.6,
     unitCapex: 3.2,
     omCost: 0.045,
     landRent: 60,
@@ -89,9 +128,17 @@ export const PRESETS: Record<ProjectType, ProjectParams> = {
     degradation: 0.3,
     efficiency: 82,
     tariff: 0.42,
+    selfUseTariff: 0.75,
+    selfUseRatio: 80,
     tariffGrowth: 0,
     capacityLease: 180,
     arbitrageSpread: 0.45,
+    storagePowerMW: 2,
+    storageEnergyMWh: 4,
+    storageCycles: 300,
+    storageEfficiency: 88,
+    storageUnitCapex: 1.1,
+    peakValleySpread: 0.6,
     unitCapex: 5.8,
     omCost: 0.08,
     landRent: 40,
@@ -110,9 +157,17 @@ export const PRESETS: Record<ProjectType, ProjectParams> = {
     degradation: 1.5,
     efficiency: 88,
     tariff: 0.35,
+    selfUseTariff: 0.75,
+    selfUseRatio: 80,
     tariffGrowth: 0,
     capacityLease: 180,
     arbitrageSpread: 0.45,
+    storagePowerMW: 2,
+    storageEnergyMWh: 4,
+    storageCycles: 300,
+    storageEfficiency: 88,
+    storageUnitCapex: 1.1,
+    peakValleySpread: 0.6,
     unitCapex: 1.1,
     omCost: 0.02,
     landRent: 12,
@@ -122,6 +177,35 @@ export const PRESETS: Record<ProjectType, ProjectParams> = {
     operationYears: 15,
     salvageRate: 5,
     taxHoliday: false,
+    vatRefund: false,
+  },
+  pvStorage: {
+    capacityMW: 5,
+    storageHours: 2,
+    utilizationHours: 1300,
+    degradation: 0.5,
+    efficiency: 82,
+    tariff: 0.35,
+    selfUseTariff: 0.75,
+    selfUseRatio: 80,
+    tariffGrowth: 0,
+    capacityLease: 180,
+    arbitrageSpread: 0.45,
+    storagePowerMW: 2,
+    storageEnergyMWh: 4,
+    storageCycles: 300,
+    storageEfficiency: 88,
+    storageUnitCapex: 1.1,
+    peakValleySpread: 0.6,
+    unitCapex: 3.2,
+    omCost: 0.045,
+    landRent: 20,
+    equityRatio: 30,
+    loanRate: 3.6,
+    loanTerm: 15,
+    operationYears: 20,
+    salvageRate: 5,
+    taxHoliday: true,
     vatRefund: false,
   },
 }
@@ -273,15 +357,27 @@ interface CoreResult {
   lcoeEnergyPV: number
 }
 
+/** 分布式光伏混合电价：自用比例 × 自用电价 + 上网比例 × 上网电价 */
+function blendedTariff(p: ProjectParams): number {
+  const self = Math.min(100, Math.max(0, p.selfUseRatio)) / 100
+  return self * p.selfUseTariff + (1 - self) * p.tariff
+}
+
 /** 核心现金流计算（被主测算与敏感性分析共用） */
 function computeCashFlows(type: ProjectType, p: ProjectParams): CoreResult {
   const isStorage = type === 'storage'
+  const isPvStorage = type === 'pvStorage'
   const years = Math.round(p.operationYears)
   const deg = p.degradation / 100
   const pr = type === 'wind' ? 1 : p.efficiency / 100
 
   const energyMWh = isStorage ? p.capacityMW * p.storageHours : 0
-  const capex = isStorage ? energyMWh * p.unitCapex * 100 : p.capacityMW * p.unitCapex * 100
+  // 光储一体化：合并投资 = PV 投资 + 储能投资（元/W × MW 与 元/Wh × MWh 均换算为万元）
+  const capex = isStorage
+    ? energyMWh * p.unitCapex * 100
+    : isPvStorage
+      ? p.capacityMW * p.unitCapex * 100 + p.storageEnergyMWh * p.storageUnitCapex * 100
+      : p.capacityMW * p.unitCapex * 100
   const equity = (capex * p.equityRatio) / 100
   const loan = capex - equity
   const schedule = annuitySchedule(loan, p.loanRate, Math.round(p.loanTerm), years)
@@ -305,22 +401,40 @@ function computeCashFlows(type: ProjectType, p: ProjectParams): CoreResult {
     const decay = Math.pow(1 - deg, t - 1)
     // E_t = 容量 × 利用小时 × (1-衰减)^(t-1) × PR；风电无 PR 项，储能 PR=充放效率
     const base = isStorage ? energyMWh : p.capacityMW
-    const gen = base * p.utilizationHours * decay * pr
-    totalGen += gen
+    const growthT = Math.pow(1 + p.tariffGrowth / 100, t - 1)
+    let gen = base * p.utilizationHours * decay * pr
 
     let revenue: number
     if (isStorage) {
       revenue = gen * p.arbitrageSpread * 0.1 + p.capacityMW * p.capacityLease * 0.1
+    } else if (isPvStorage) {
+      // 光伏收入：同纯光伏口径（自发自用 + 余电上网）
+      const pvRevenue = gen * blendedTariff(p) * growthT * 0.1
+      // 储能收入 = 年放电量 × 峰谷价差；年放电量 = 容量 MWh × 年循环次数 × 充放效率
+      const effS = p.storageEfficiency / 100
+      const discharge = p.storageEnergyMWh * p.storageCycles * effS
+      const storageRevenue = discharge * p.peakValleySpread * 0.1
+      // 储能充电成本 = 年充电量（放电量/效率）× 上网电价（机会成本口径：视为用余电充电），从储能收入中扣除
+      const chargeCost = (effS > 0 ? discharge / effS : 0) * p.tariff * 0.1
+      revenue = pvRevenue + storageRevenue - chargeCost
+      // 合并电量口径（用于 LCOE 与图表）：光伏发电量 + 储能放电量
+      gen = gen + discharge
+    } else if (type === 'pv') {
+      // 分布式光伏：收入 = 年发电量 × [自用比例 × 自用电价 + (1−自用比例) × 上网电价]
+      revenue = gen * blendedTariff(p) * growthT * 0.1
     } else {
-      const tariffT = p.tariff * Math.pow(1 + p.tariffGrowth / 100, t - 1)
+      const tariffT = p.tariff * growthT
       revenue = gen * tariffT * 0.1
     }
+    totalGen += gen
 
     const vatIncome = p.vatRefund && !isStorage ? revenue * VAT_RATE * 0.5 : 0
-    const opex =
-      (isStorage ? energyMWh * p.omCost * 100 : p.capacityMW * p.omCost * 100) +
-      p.landRent +
-      insurance
+    const opexBase = isStorage
+      ? energyMWh * p.omCost * 100
+      : isPvStorage
+        ? (p.capacityMW + p.storagePowerMW) * p.omCost * 100
+        : p.capacityMW * p.omCost * 100
+    const opex = opexBase + p.landRent + insurance
 
     const interest = schedule[t - 1].interest
     const dep = t <= DEP_YEARS ? depreciation : 0
@@ -406,34 +520,62 @@ export function computeMetrics(type: ProjectType, p: ProjectParams): FinancialMe
 /** 敏感性分析：电价/造价/利用小时 ±10%、利率 ±1pct 对资本金 IRR 的影响（按影响幅度排序） */
 export function computeSensitivity(type: ProjectType, p: ProjectParams): SensitivityItem[] {
   const isStorage = type === 'storage'
+  const isPvStorage = type === 'pvStorage'
+  const priceLabel = isStorage
+    ? '套利价差 ±10%'
+    : isPvStorage
+      ? '电价/峰谷价差 ±10%'
+      : type === 'pv'
+        ? '电价（自用/上网）±10%'
+        : '上网电价 ±10%'
   const raw: (SensitivityItem & { span: number })[] = [
     {
       key: 'price',
-      label: isStorage ? '套利价差 ±10%' : '上网电价 ±10%',
+      label: priceLabel,
       low: equityIRR(type, {
         ...p,
         arbitrageSpread: isStorage ? p.arbitrageSpread * 0.9 : p.arbitrageSpread,
         tariff: isStorage ? p.tariff : p.tariff * 0.9,
+        selfUseTariff: type === 'pv' || isPvStorage ? p.selfUseTariff * 0.9 : p.selfUseTariff,
+        peakValleySpread: isPvStorage ? p.peakValleySpread * 0.9 : p.peakValleySpread,
       }),
       high: equityIRR(type, {
         ...p,
         arbitrageSpread: isStorage ? p.arbitrageSpread * 1.1 : p.arbitrageSpread,
         tariff: isStorage ? p.tariff : p.tariff * 1.1,
+        selfUseTariff: type === 'pv' || isPvStorage ? p.selfUseTariff * 1.1 : p.selfUseTariff,
+        peakValleySpread: isPvStorage ? p.peakValleySpread * 1.1 : p.peakValleySpread,
       }),
       span: 0,
     },
     {
       key: 'capex',
       label: '单位造价 ±10%',
-      low: equityIRR(type, { ...p, unitCapex: p.unitCapex * 1.1 }),
-      high: equityIRR(type, { ...p, unitCapex: p.unitCapex * 0.9 }),
+      low: equityIRR(type, {
+        ...p,
+        unitCapex: p.unitCapex * 1.1,
+        storageUnitCapex: isPvStorage ? p.storageUnitCapex * 1.1 : p.storageUnitCapex,
+      }),
+      high: equityIRR(type, {
+        ...p,
+        unitCapex: p.unitCapex * 0.9,
+        storageUnitCapex: isPvStorage ? p.storageUnitCapex * 0.9 : p.storageUnitCapex,
+      }),
       span: 0,
     },
     {
       key: 'hours',
-      label: isStorage ? '循环次数 ±10%' : '利用小时 ±10%',
-      low: equityIRR(type, { ...p, utilizationHours: p.utilizationHours * 0.9 }),
-      high: equityIRR(type, { ...p, utilizationHours: p.utilizationHours * 1.1 }),
+      label: isStorage ? '循环次数 ±10%' : isPvStorage ? '利用小时/循环次数 ±10%' : '利用小时 ±10%',
+      low: equityIRR(type, {
+        ...p,
+        utilizationHours: p.utilizationHours * 0.9,
+        storageCycles: isPvStorage ? p.storageCycles * 0.9 : p.storageCycles,
+      }),
+      high: equityIRR(type, {
+        ...p,
+        utilizationHours: p.utilizationHours * 1.1,
+        storageCycles: isPvStorage ? p.storageCycles * 1.1 : p.storageCycles,
+      }),
       span: 0,
     },
     {

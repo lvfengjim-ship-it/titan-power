@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { cn } from '@/lib/utils'
+import { MIN_CAPACITY_MW } from './finance'
 import type { ProjectParams, ProjectType } from './finance'
 
 /* ---------- 基础控件 ---------- */
@@ -123,6 +124,17 @@ const TYPE_TABS: { key: ProjectType; label: string; icon: ReactNode; active: str
     icon: <BatteryCharging className="h-4 w-4" />,
     active: 'text-[#7A8CFF]',
   },
+  {
+    key: 'pvStorage',
+    label: '光+储',
+    icon: (
+      <span className="flex items-center">
+        <Sun className="h-3.5 w-3.5" />
+        <BatteryCharging className="h-3.5 w-3.5" />
+      </span>
+    ),
+    active: 'text-solar-300',
+  },
 ]
 
 function TypeTabs({
@@ -133,7 +145,7 @@ function TypeTabs({
   onChange: (t: ProjectType) => void
 }) {
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-ink-850 p-1">
+    <div className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-ink-850 p-1 sm:grid-cols-4">
       {TYPE_TABS.map((tab) => {
         const active = value === tab.key
         return (
@@ -179,6 +191,12 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
 
   const isWind = type === 'wind'
   const isStorage = type === 'storage'
+  const isPv = type === 'pv'
+  const isPvStorage = type === 'pvStorage'
+  /** 含光伏子模型（纯光伏 / 光储一体化）→ 使用双电价 + 自用比例 */
+  const hasPvPart = isPv || isPvStorage
+  /** 容量滑块最小规模约束（光伏 0.5 / 风电 6 / 储能 0.5 MW） */
+  const capMin = MIN_CAPACITY_MW[type]
 
   return (
     <motion.div
@@ -218,12 +236,13 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <SliderRow
-                label={isStorage ? '装机功率' : '装机容量'}
+                label={isStorage ? '装机功率' : isPvStorage ? '光伏装机容量' : '装机容量'}
                 value={params.capacityMW}
-                min={1}
+                min={capMin}
                 max={500}
-                step={1}
+                step={isWind ? 1 : 0.5}
                 unit="MW"
+                digits={isWind ? 0 : 1}
                 onChange={(v) => set('capacityMW', v)}
               />
               {isStorage && (
@@ -244,6 +263,40 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                   {(params.capacityMW * params.storageHours).toFixed(0)} MWh
                 </p>
               )}
+              {isPvStorage && (
+                <SliderRow
+                  label="储能功率"
+                  value={params.storagePowerMW}
+                  min={0.5}
+                  max={100}
+                  step={0.5}
+                  unit="MW"
+                  digits={1}
+                  onChange={(v) => set('storagePowerMW', v)}
+                />
+              )}
+              {isPvStorage && (
+                <SliderRow
+                  label="储能容量"
+                  value={params.storageEnergyMWh}
+                  min={1}
+                  max={200}
+                  step={0.5}
+                  unit="MWh"
+                  digits={1}
+                  onChange={(v) => set('storageEnergyMWh', v)}
+                />
+              )}
+              {isPvStorage && (
+                <p className="font-mono text-[11px] text-dim">
+                  光储配置 = 光伏 {params.capacityMW} MW + 储能 {params.storagePowerMW} MW ·{' '}
+                  {params.storageEnergyMWh} MWh（
+                  {params.storagePowerMW > 0
+                    ? (params.storageEnergyMWh / params.storagePowerMW).toFixed(1)
+                    : '—'}
+                  h）
+                </p>
+              )}
             </AccordionContent>
           </AccordionItem>
 
@@ -257,7 +310,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <SliderRow
-                label={isStorage ? '等效满充放次数' : '首年利用小时'}
+                label={isStorage ? '等效满充放次数' : isPvStorage ? '光伏首年利用小时' : '首年利用小时'}
                 value={params.utilizationHours}
                 min={isStorage ? 100 : 800}
                 max={isStorage ? 500 : 2600}
@@ -266,7 +319,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                 onChange={(v) => set('utilizationHours', v)}
               />
               <SliderRow
-                label={isStorage ? '容量年衰减率' : '年衰减率'}
+                label={isStorage ? '容量年衰减率' : isPvStorage ? '光伏年衰减率' : '年衰减率'}
                 value={params.degradation}
                 min={0}
                 max={isStorage ? 3 : 1.5}
@@ -287,6 +340,29 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                   onChange={(v) => set('efficiency', v)}
                 />
               )}
+              {isPvStorage && (
+                <SliderRow
+                  label="储能年循环次数"
+                  value={params.storageCycles}
+                  min={100}
+                  max={500}
+                  step={5}
+                  unit="次/年"
+                  onChange={(v) => set('storageCycles', v)}
+                />
+              )}
+              {isPvStorage && (
+                <SliderRow
+                  label="储能充放效率"
+                  value={params.storageEfficiency}
+                  min={75}
+                  max={95}
+                  step={0.5}
+                  unit="%"
+                  digits={1}
+                  onChange={(v) => set('storageEfficiency', v)}
+                />
+              )}
             </AccordionContent>
           </AccordionItem>
 
@@ -299,10 +375,32 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
-              {!isStorage && (
+              {isWind && (
+                <NumberRow
+                  label="上网电价"
+                  value={params.tariff}
+                  min={0.15}
+                  max={0.65}
+                  step={0.005}
+                  digits={3}
+                  unit="元/kWh"
+                  onChange={(v) => set('tariff', v)}
+                />
+              )}
+              {hasPvPart && (
                 <>
                   <NumberRow
-                    label="上网电价"
+                    label="客户自用电价"
+                    value={params.selfUseTariff}
+                    min={0.3}
+                    max={1.5}
+                    step={0.01}
+                    digits={2}
+                    unit="元/kWh"
+                    onChange={(v) => set('selfUseTariff', v)}
+                  />
+                  <NumberRow
+                    label="上网电价（余电）"
                     value={params.tariff}
                     min={0.15}
                     max={0.65}
@@ -312,16 +410,46 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                     onChange={(v) => set('tariff', v)}
                   />
                   <SliderRow
-                    label="电价年增长率"
-                    value={params.tariffGrowth}
-                    min={-2}
-                    max={3}
-                    step={0.1}
+                    label="自用比例"
+                    value={params.selfUseRatio}
+                    min={0}
+                    max={100}
+                    step={1}
                     unit="%"
-                    digits={1}
-                    onChange={(v) => set('tariffGrowth', v)}
+                    onChange={(v) => set('selfUseRatio', v)}
                   />
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-mist">上网比例</span>
+                    <ValueText>
+                      {(100 - params.selfUseRatio).toFixed(0)}
+                      <span className="ml-1 text-[11px] text-dim">%（= 100% − 自用比例，余电上网）</span>
+                    </ValueText>
+                  </div>
                 </>
+              )}
+              {!isStorage && (
+                <SliderRow
+                  label="电价年增长率"
+                  value={params.tariffGrowth}
+                  min={-2}
+                  max={3}
+                  step={0.1}
+                  unit="%"
+                  digits={1}
+                  onChange={(v) => set('tariffGrowth', v)}
+                />
+              )}
+              {isPvStorage && (
+                <NumberRow
+                  label="峰谷价差"
+                  value={params.peakValleySpread}
+                  min={0.1}
+                  max={1.5}
+                  step={0.01}
+                  digits={2}
+                  unit="元/kWh"
+                  onChange={(v) => set('peakValleySpread', v)}
+                />
               )}
               {isStorage && (
                 <>
@@ -360,7 +488,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <NumberRow
-                label="单位造价"
+                label={isPvStorage ? '光伏单位造价' : '单位造价'}
                 value={params.unitCapex}
                 min={isStorage ? 0.5 : 2}
                 max={isStorage ? 2.5 : 10}
@@ -369,6 +497,18 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                 unit={isStorage ? '元/Wh' : '元/W'}
                 onChange={(v) => set('unitCapex', v)}
               />
+              {isPvStorage && (
+                <NumberRow
+                  label="储能单位造价"
+                  value={params.storageUnitCapex}
+                  min={0.5}
+                  max={2.5}
+                  step={0.05}
+                  digits={2}
+                  unit="元/Wh"
+                  onChange={(v) => set('storageUnitCapex', v)}
+                />
+              )}
               <NumberRow
                 label="年运维成本"
                 value={params.omCost}

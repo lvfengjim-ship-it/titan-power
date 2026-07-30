@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { PROJECT_TYPE_LABEL } from './finance'
 import type { FinancialMetrics, ProjectParams, ProjectType } from './finance'
 
 export type ReportStatus = 'idle' | 'streaming' | 'done' | 'error'
@@ -66,7 +67,8 @@ export function useAiReport(): ReportState {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              projectType,
+              // 传入后端的中文类型名（光伏 / 风电 / 储能 / 光伏+储能一体化），后端直接写入 prompt
+              projectType: PROJECT_TYPE_LABEL[projectType],
               params,
               metrics: {
                 equityIRR: metrics.equityIRR,
