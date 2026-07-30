@@ -1,7 +1,27 @@
 // YouTube 前沿技术视频抓取 + DeepSeek 中文解读 + 入库缓存
 // 需要环境变量 YOUTUBE_API_KEY；无 key 时跳过抓取（前端有内置 fallback 数据）
+// 国内服务器访问 googleapis.com 需走代理：设置 HTTPS_PROXY 后 YouTube 请求经 undici ProxyAgent 发出
+import { ProxyAgent } from "undici";
 import { deepseekChat, hasDeepSeekKey } from "../ai/deepseek";
 import { upsertVideo, countVideos } from "../queries/videos";
+
+// Node 全局 fetch 不读 HTTP(S)_PROXY 环境变量，需显式传入 dispatcher
+let _ytDispatcher: ProxyAgent | undefined;
+function ytDispatcher(): ProxyAgent | undefined {
+  if (_ytDispatcher !== undefined) return _ytDispatcher;
+  const proxy = (process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy || "").trim();
+  if (proxy) {
+    _ytDispatcher = new ProxyAgent(proxy);
+    console.log(`[videos] YouTube requests via proxy: ${proxy}`);
+  }
+  return _ytDispatcher;
+}
+
+function ytFetch(url: URL | string) {
+  const dispatcher = ytDispatcher();
+  // 类型说明：undici 的 dispatcher 选项与 DOM fetch 类型不兼容，需断言
+  return fetch(url, dispatcher ? ({ dispatcher } as RequestInit) : undefined);
+}
 
 // 策展关键词：分类 -> YouTube 搜索词（核能/氢能/储能/光伏/风电前沿）
 const QUERIES: { category: string; q: string }[] = [
@@ -65,7 +85,7 @@ export async function fetchAndCacheVideos(): Promise<number> {
         part: "snippet", q, type: "video", order: "date", maxResults: "4",
         relevanceLanguage: "en", key: ytKey(),
       }).toString();
-      const searchRes = await fetch(searchUrl);
+      const searchRes = await ytFetch(searchUrl);
       if (!searchRes.ok) throw new Error(`search ${searchRes.status}`);
       const searchData = (await searchRes.json()) as {
         items?: { id?: { videoId?: string }; snippet?: { title?: string; description?: string; channelTitle?: string; publishedAt?: string; thumbnails?: { high?: { url?: string } } } }[];
@@ -77,7 +97,7 @@ export async function fetchAndCacheVideos(): Promise<number> {
       videosUrl.search = new URLSearchParams({
         part: "contentDetails", id: ids.join(","), key: ytKey(),
       }).toString();
-      const videosRes = await fetch(videosUrl);
+      const videosRes = await ytFetch(videosUrl);
       const videosData = videosRes.ok
         ? ((await videosRes.json()) as { items?: { id?: string; contentDetails?: { duration?: string } }[] })
         : { items: [] };

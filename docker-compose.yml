@@ -24,6 +24,10 @@ services:
       APP_SECRET: change-me-to-a-long-random-string
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:-}
+      # 访问 YouTube API 需走本机代理：在 .env 中设置 HTTPS_PROXY=http://host.docker.internal:7890
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      NO_PROXY: localhost,127.0.0.1,mysql
     depends_on:
       mysql:
         condition: service_healthy
