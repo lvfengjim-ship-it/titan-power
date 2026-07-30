@@ -34,6 +34,54 @@ export const MIN_CAPACITY_MW: Record<ProjectType, number> = {
   pvStorage: 0.5,
 }
 
+/**
+ * 各项目类型与 AI 报告相关的参数字段白名单。
+ * 修复 bug：纯光伏/风电/储能的报告曾把无关默认参数（如储能功率/容量）一并发给 AI，
+ * 导致报告标题与内容混入其他类型。发送前按类型裁剪，确保 AI 只看到本类型参数。
+ */
+const REPORT_PARAM_KEYS: Record<ProjectType, (keyof ProjectParams)[]> = {
+  pv: [
+    'capacityMW', 'utilizationHours', 'degradation', 'efficiency',
+    'tariff', 'selfUseTariff', 'selfUseRatio', 'tariffGrowth',
+    'unitCapex', 'omCost', 'landRent',
+    'equityRatio', 'loanRate', 'loanTerm', 'operationYears', 'salvageRate',
+    'taxHoliday', 'vatRefund',
+  ],
+  wind: [
+    'capacityMW', 'utilizationHours', 'degradation',
+    'tariff', 'tariffGrowth',
+    'unitCapex', 'omCost', 'landRent',
+    'equityRatio', 'loanRate', 'loanTerm', 'operationYears', 'salvageRate',
+    'taxHoliday', 'vatRefund',
+  ],
+  storage: [
+    'capacityMW', 'storageHours', 'utilizationHours', 'degradation', 'efficiency',
+    'capacityLease', 'arbitrageSpread',
+    'unitCapex', 'omCost', 'landRent',
+    'equityRatio', 'loanRate', 'loanTerm', 'operationYears', 'salvageRate',
+    'taxHoliday', 'vatRefund',
+  ],
+  pvStorage: [
+    'capacityMW', 'utilizationHours', 'degradation', 'efficiency',
+    'tariff', 'selfUseTariff', 'selfUseRatio', 'tariffGrowth',
+    'storagePowerMW', 'storageEnergyMWh', 'storageCycles', 'storageEfficiency',
+    'storageUnitCapex', 'peakValleySpread',
+    'unitCapex', 'omCost', 'landRent',
+    'equityRatio', 'loanRate', 'loanTerm', 'operationYears', 'salvageRate',
+    'taxHoliday', 'vatRefund',
+  ],
+}
+
+/** 按项目类型裁剪参数，只保留该类型评估实际使用的字段（供 AI 报告请求使用） */
+export function sanitizeParamsForReport(type: ProjectType, params: ProjectParams): Partial<ProjectParams> {
+  const out: Partial<ProjectParams> = {}
+  for (const key of REPORT_PARAM_KEYS[type]) {
+    // @ts-expect-error 白名单键与字段类型一一对应
+    out[key] = params[key]
+  }
+  return out
+}
+
 export interface ProjectParams {
   /** 装机容量 MW */
   capacityMW: number

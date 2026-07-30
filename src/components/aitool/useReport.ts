@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { PROJECT_TYPE_LABEL } from './finance'
+import { PROJECT_TYPE_LABEL, sanitizeParamsForReport } from './finance'
 import type { FinancialMetrics, ProjectParams, ProjectType } from './finance'
 
 export type ReportStatus = 'idle' | 'streaming' | 'done' | 'error'
@@ -69,7 +69,8 @@ export function useAiReport(): ReportState {
             body: JSON.stringify({
               // 传入后端的中文类型名（光伏 / 风电 / 储能 / 光伏+储能一体化），后端直接写入 prompt
               projectType: PROJECT_TYPE_LABEL[projectType],
-              params,
+              // 按类型裁剪参数，避免无关默认字段（如纯光伏携带储能参数）误导 AI
+              params: sanitizeParamsForReport(projectType, params),
               metrics: {
                 equityIRR: metrics.equityIRR,
                 projectIRR: metrics.projectIRR,
