@@ -1,0 +1,11 @@
+# titan-power.cn 生产配置 —— Caddy 自动签发/续期 Let's Encrypt 证书
+# 前提：DNS A 记录 titan-power.cn 与 www.titan-power.cn 已指向本服务器，80/443 已放行
+
+www.titan-power.cn {
+	redir https://titan-power.cn{uri} permanent
+}
+
+titan-power.cn {
+	encode zstd gzip
+	reverse_proxy app:3000
+}

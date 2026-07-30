@@ -1,3 +1,5 @@
+# 阿里云生产部署：Caddy(80/443, 自动 HTTPS) → app:3000 → mysql:3306
+# 视频抓取在 Mac Studio 完成（走代理），经 /api/videos/ingest 推送入库
 services:
   mysql:
     image: mysql:8.4
@@ -16,21 +18,37 @@ services:
   app:
     build: .
     restart: unless-stopped
-    ports:
-      - "3100:3000"
     environment:
       DATABASE_URL: mysql://root:titan_root_change_me@mysql:3306/titan
       APP_ID: titan-power
       APP_SECRET: change-me-to-a-long-random-string
+      # DeepSeek 大陆可直连，AI 投资评估报告在服务器端调用
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
-      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:-}
-      # 访问 YouTube API 需走本机代理：在 .env 中设置 HTTPS_PROXY=http://host.docker.internal:7890
-      HTTPS_PROXY: ${HTTPS_PROXY:-}
-      HTTP_PROXY: ${HTTP_PROXY:-}
-      NO_PROXY: localhost,127.0.0.1,mysql
+      # ingest 模式：服务器不自抓 YouTube，等 Mac 抓取端推送
+      VIDEO_INGEST: "1"
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
+      DATA_DIR: /app/data
+    volumes:
+      - video-data:/app/data
     depends_on:
       mysql:
         condition: service_healthy
 
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+
 volumes:
   mysql-data:
+  video-data:
+  caddy-data:
+  caddy-config:
