@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="tp-gold" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8CF6A"/>
+      <stop offset="0.45" stop-color="#F2B33D"/>
+      <stop offset="1" stop-color="#E8862A"/>
+    </linearGradient>
+    <filter id="tp-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- capital T: crossbar shaped as a wind-turbine blade, stem fused with a lightning bolt -->
+  <g filter="url(#tp-glow)" fill="url(#tp-gold)">
+    <!-- blade crossbar: swept, tapered blade geometry -->
+    <path d="M6 18.5 L30.5 12.6 L57.5 9.4 L58.8 13.2 L31.5 19.6 L10.2 22.4 Z"/>
+    <!-- counter blade fin -->
+    <path d="M33 19.2 L46.5 24.8 L44.9 27.6 L29.6 21.6 Z"/>
+    <!-- lightning-bolt stem -->
+    <path d="M28.4 20.4 L36.6 20.4 L31.9 32.2 L38.4 32.2 L25.6 55.8 L28.9 36.4 L23.3 36.4 Z"/>
+  </g>
+</svg>
