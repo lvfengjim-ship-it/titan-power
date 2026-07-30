@@ -16,7 +16,7 @@ export default function StubPage({ crumb, title, lead, image }: Props) {
       <section className="mx-auto max-w-[1280px] px-6 py-24 lg:px-10">
         <p className="font-mono text-xs tracking-[0.2em] text-dim">UNDER CONSTRUCTION</p>
         <p className="mt-4 max-w-xl text-base leading-8 text-mist">
-          本页面内容正在建设中，敬请期待。您可先体验全站开放的 AI 投资评估工具，或浏览首页了解泰坦能源的业务版图。
+          本页面内容正在建设中，敬请期待。您可先体验全站开放的 AI 投资评估工具，或浏览首页了解彭田环保的业务版图。
         </p>
       </section>
       <CTABand />

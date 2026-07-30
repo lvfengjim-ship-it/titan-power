@@ -1,12 +1,10 @@
-import { Link } from 'react-router'
-import { TrendingUp, Handshake, Activity } from 'lucide-react'
+import { useNavigate } from 'react-router'
+import { TrendingUp, Handshake, Activity, Layers, BrainCircuit, Workflow, Users2 } from 'lucide-react'
 import HeroSection from '@/components/home/HeroSection'
 import PhilosophySection from '@/components/home/PhilosophySection'
 import AiToolSection from '@/components/home/AiToolSection'
 import InsightsSection from '@/components/home/InsightsSection'
-import GallerySection from '@/components/home/GallerySection'
 import SectionHeading from '@/components/SectionHeading'
-import StatBlock from '@/components/StatBlock'
 import TagBadge from '@/components/TagBadge'
 import MediaCard from '@/components/MediaCard'
 import GlowCard from '@/components/GlowCard'
@@ -16,28 +14,28 @@ import Reveal from '@/components/Reveal'
 
 const BUSINESS_CARDS = [
   {
-    img: '/business-pv.jpg',
+    img: '/project-zhejiang-rooftop.jpg',
     tone: 'gold' as const,
     tag: '光伏',
-    title: '集中式与分布式光伏投资',
-    desc: '戈壁基地、工商业屋顶、整县推进，全场景光伏资产开发与投资。',
-    meta: 'PV / 640 MW IN PORTFOLIO',
+    title: '分布式光伏投资',
+    desc: '聚焦工商业屋顶与园区分布式光伏，深耕就近消纳、长期稳定的清洁能源资产。',
+    meta: 'PV / DISTRIBUTED ROOFTOP',
   },
   {
     img: '/business-wind.jpg',
     tone: 'volt' as const,
     tag: '风电',
-    title: '陆上及海上风电布局',
-    desc: '聚焦优质风资源区，布局陆上大基地与近海风电项目。',
-    meta: 'WIND / 380 MW',
+    title: '分布式风电',
+    desc: '聚焦分散式与园区风电项目，以灵活装机匹配负荷场景，释放就地绿色电力价值。',
+    meta: 'WIND / DISTRIBUTED',
   },
   {
     img: '/business-storage.jpg',
     tone: 'storage' as const,
     tag: '储能',
-    title: '独立储能与风光储一体化',
-    desc: '电网侧独立储能、共享储能、源网荷储一体化项目投资与容量运营。',
-    meta: 'STORAGE / 200 MWh',
+    title: '工商业储能、独立储能与风光储一体化',
+    desc: '工商业储能、电网侧独立储能、共享储能、源网荷储一体化项目投资与容量运营。',
+    meta: 'STORAGE / C&I + GRID-SIDE',
   },
 ]
 
@@ -59,18 +57,11 @@ const MODES = [
   },
 ]
 
-const STATS: { value: number; decimals?: number; suffix: string; label: string; note: string }[] = [
-  { value: 45, suffix: '亿元', label: '累计投资规模', note: 'TOTAL INVESTED' },
-  { value: 1.2, decimals: 1, suffix: 'GW+', label: '累计管理装机', note: 'CAPACITY UNDER MGMT' },
-  { value: 38, suffix: '座', label: '在运电站', note: 'PLANTS IN OPERATION' },
-  { value: 18, suffix: '亿 kWh', label: '年绿色发电量', note: 'ANNUAL GENERATION' },
-  { value: 12, suffix: '个', label: '覆盖省/自治区', note: 'PROVINCES COVERED' },
-  { value: 150, suffix: '万吨', label: '年 CO₂ 减排量', note: 'CO₂ REDUCED / YEAR' },
-]
-
-const PARTNERS = ['国家电网', '华能集团', '金风科技', '宁德时代', '隆基绿能', '阳光电源', '国家电投', '三峡能源']
+const PARTNERS = ['华为太阳能', '晶科能源', '固德威', '南网综能', '中新春兴', '长春英利']
 
 export default function Home() {
+  const navigate = useNavigate()
+
   return (
     <>
       <HeroSection />
@@ -81,7 +72,7 @@ export default function Home() {
           <SectionHeading
             eyebrow="Our Business"
             title="投资 · 并购 · 运营，贯穿电站全生命周期"
-            description="从项目开发投资、存量电站并购到智慧化运营，泰坦能源构建了覆盖新能源资产全生命周期的能力闭环。"
+            description="从项目开发投资、存量电站并购到智慧化运营，彭田环保构建了覆盖新能源资产全生命周期的能力闭环。"
           />
         </Reveal>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -107,7 +98,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 3 — 核心数据 */}
+      {/* Section 3 — 为什么选择彭田环保 */}
       <section className="relative overflow-hidden bg-ink-900 py-24">
         <svg
           className="tp-drift pointer-events-none absolute -right-40 -top-20 h-[480px] w-[720px] opacity-[0.06]"
@@ -123,35 +114,49 @@ export default function Home() {
             />
           ))}
         </svg>
-        <div className="relative mx-auto flex max-w-[1440px] flex-col gap-16 px-6 lg:flex-row lg:items-center lg:px-10">
-          <div className="lg:w-1/3">
-            <Reveal>
-              <h2 className="font-serif text-[clamp(1.75rem,3.2vw,2.5rem)] font-bold leading-[1.2] text-paper">
-                用数据说话
-              </h2>
-              <p className="mt-5 max-w-sm text-base leading-8 text-mist">
-                十年深耕，泰坦能源以稳健的投资纪律与精益的运营体系，持续创造穿越周期的回报。
-              </p>
-              <Link
-                to="/projects"
-                className="mt-8 inline-block rounded-xl border border-line-strong px-6 py-3 text-sm font-medium text-paper transition-all duration-300 hover:border-solar-400 hover:bg-solar-400/[0.08] hover:text-solar-300"
-              >
-                查看项目案例
-              </Link>
+        <div className="relative mx-auto max-w-[1280px] px-6 lg:px-10">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Why Us"
+              title="为什么选择彭田环保"
+              description="以产业深度与长期主义为底色，用 AI 与一体化能力，做值得信赖的绿色资产伙伴。"
+            />
+          </Reveal>
+          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Reveal delay={0}>
+              <GlowCard
+                icon={<Layers className="h-5 w-5" />}
+                title="产业深度，长期持有"
+                description="以资产全周期视角做决策，陪伴每一座电站穿越完整生命周期，追求穿越周期的稳健回报。"
+                className="h-full"
+              />
             </Reveal>
-          </div>
-          <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-12 lg:grid-cols-3">
-            {STATS.map((s, i) => (
-              <Reveal key={s.label} delay={i * 100} y={24}>
-                <StatBlock
-                  value={s.value}
-                  decimals={s.decimals ?? 0}
-                  suffix={s.suffix}
-                  label={s.label}
-                  note={s.note}
-                />
-              </Reveal>
-            ))}
+            <Reveal delay={100}>
+              <GlowCard
+                icon={<BrainCircuit className="h-5 w-5 text-volt-400" />}
+                title="AI 驱动的投资方法论"
+                description="内部估值模型与公开版 AI 评估工具同源，用数据与算法提升投资判断的确定性。"
+                linkText="体验 AI 投资评估"
+                onClick={() => navigate('/ai-tool')}
+                className="h-full"
+              />
+            </Reveal>
+            <Reveal delay={200}>
+              <GlowCard
+                icon={<Workflow className="h-5 w-5" />}
+                title="开发-并购-运营一体化能力"
+                description="开发、并购、运营三位一体，从项目孵化到资产交付形成能力闭环，全链条把控资产质量。"
+                className="h-full"
+              />
+            </Reveal>
+            <Reveal delay={300}>
+              <GlowCard
+                icon={<Users2 className="h-5 w-5 text-volt-400" />}
+                title="产融结合的伙伴生态"
+                description="连接产业伙伴与金融机构，以开放协同的生态网络，与伙伴共享绿色资产的长期收益。"
+                className="h-full"
+              />
+            </Reveal>
           </div>
         </div>
       </section>
@@ -165,10 +170,7 @@ export default function Home() {
       {/* Section 6 — 前沿视频精选 */}
       <InsightsSection />
 
-      {/* Section 7 — 项目横滚画廊 */}
-      <GallerySection />
-
-      {/* Section 8 — 合作生态 + 关注我们 */}
+      {/* Section 7 — 合作生态 + 关注我们 */}
       <section className="mx-auto max-w-[1280px] px-6 py-24 lg:px-10">
         <Reveal>
           <p className="flex items-center justify-center gap-3 font-display text-xs font-medium uppercase tracking-[0.28em] text-solar-400">
@@ -200,7 +202,7 @@ export default function Home() {
             <QRConnectCard
               src="/qr-wechat-official.png"
               platform="公众号"
-              title="泰坦能源·公众号"
+              title="彭田环保·公众号"
               accent="gold"
             />
           </Reveal>
@@ -216,14 +218,14 @@ export default function Home() {
             <QRConnectCard
               src="/qr-wechat-channel.png"
               platform="视频号"
-              title="泰坦能源·视频号"
+              title="彭田环保·视频号"
               accent="volt"
             />
           </Reveal>
         </div>
       </section>
 
-      {/* Section 9 — CTA Band */}
+      {/* Section 8 — CTA Band */}
       <CTABand />
     </>
   )

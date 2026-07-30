@@ -100,7 +100,7 @@ function DashboardMock() {
         }}
       >
         <div className="flex items-center justify-between">
-          <p className="font-mono text-xs tracking-[0.15em] text-dim">TITAN AI · PROJECT EVAL</p>
+          <p className="font-mono text-xs tracking-[0.15em] text-dim">PT AI · PROJECT EVAL</p>
           <span className="flex h-2 w-2">
             <span className="absolute h-2 w-2 animate-ping rounded-full bg-volt-400 opacity-60" />
             <span className="h-2 w-2 rounded-full bg-volt-400" />

@@ -17,7 +17,6 @@ import {
 import PageHero from '@/components/PageHero'
 import SectionHeading from '@/components/SectionHeading'
 import GlowCard from '@/components/GlowCard'
-import StatBlock from '@/components/StatBlock'
 import TagBadge from '@/components/TagBadge'
 import Reveal from '@/components/Reveal'
 import { cn } from '@/lib/utils'
@@ -31,16 +30,16 @@ const MODELS = [
     tag: '模式 01',
     tone: 'gold' as const,
     title: '新能源项目投资',
-    image: '/business-pv.jpg',
-    alt: '戈壁光伏电站航拍',
-    body: '面向具备开发条件的集中式光伏、工商业分布式、陆上/海上风电与独立储能项目，泰坦能源以直投或联合开发方式提供资本金支持，覆盖从项目备案、建设到并网的全过程。',
+    image: '/project-zhejiang-rooftop.jpg',
+    alt: '工商业屋顶分布式光伏航拍',
+    body: '面向具备开发条件的工商业屋顶与园区分布式光伏、分散式风电，以及工商业储能、独立储能与风光储一体化项目，彭田环保以直投或联合开发方式提供资本金支持，覆盖从项目备案、建设到并网的全过程。',
     points: [
       '项目直投与联合开发',
-      '建设期融资结构化安排',
-      '整县推进与园区综合能源',
-      '源网荷储一体化项目孵化',
+      '工商业屋顶与园区分布式光伏',
+      '分散式风电项目孵化',
+      '工商业储能与源网荷储一体化',
     ],
-    data: 'TYPICAL TICKET · 0.5–5 亿元/项目',
+    data: 'DIRECT INVESTMENT · JOINT DEVELOPMENT',
   },
   {
     tag: '模式 02',
@@ -48,14 +47,14 @@ const MODELS = [
     title: '存量电站并购',
     image: '/business-storage.jpg',
     alt: '集装箱式储能电站',
-    body: '针对已建成并网的光伏、风电与储能电站，我们提供快速、确定性的整体收购方案。标准化的尽调流程与内部 AI 评估体系，让交易决策周期缩短至 30 天。',
+    body: '针对已建成并网的光伏、风电与储能电站，我们提供快速、确定性的整体收购方案。标准化的尽调流程与内部 AI 评估体系，让交易决策更快、更确定。',
     points: [
       '股权整体收购与资产收购',
-      '30 天标准化尽调与定价',
+      '标准化尽调与快速定价',
       '遗留问题结构化解决方案',
       '卖方保留运营参与权的灵活安排',
     ],
-    data: 'DD CYCLE · 30 DAYS / AI-ASSISTED VALUATION',
+    data: 'AI-ASSISTED VALUATION · FAST DD',
   },
   {
     tag: '模式 03',
@@ -70,7 +69,7 @@ const MODELS = [
       '设备健康管理与技改增效',
       '碳资产与绿证开发',
     ],
-    data: 'AVAILABILITY · 99.2% / PR IMPROVEMENT +2.1%',
+    data: 'SMART O&M · PERFORMANCE IMPROVEMENT',
   },
 ]
 
@@ -79,7 +78,7 @@ function Models() {
     <section className="py-24 lg:py-32">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <Reveal>
-          <SectionHeading eyebrow="BUSINESS MODELS" title="三种方式，与泰坦合作" />
+          <SectionHeading eyebrow="BUSINESS MODELS" title="三种方式，与彭田合作" />
         </Reveal>
 
         <div className="mt-16 space-y-16 lg:space-y-24">
@@ -163,16 +162,16 @@ const MATRIX_ROWS: { mode: string; en: string; cells: Cell[] }[] = [
     mode: '投资',
     en: 'INVESTMENT',
     cells: [
-      { text: '基地 / 分布式全场景直投' },
-      { text: '陆上 / 海上风电联合开发' },
-      { text: '源网荷储一体化项目孵化' },
+      { text: '工商业屋顶 / 园区分布式直投' },
+      { text: '分散式 / 园区风电联合开发' },
+      { text: '工商业储能与风光储一体化孵化' },
     ],
   },
   {
     mode: '并购',
     en: 'M&A',
     cells: [
-      { text: '集中式 / 分布式存量电站整体收购' },
+      { text: '分布式存量电站整体收购' },
       { text: '在运风电场股权收购' },
       { text: '独立储能容量资产收购' },
     ],
@@ -371,8 +370,24 @@ function Capabilities() {
             </p>
           </Reveal>
           <div className="mt-10 space-y-10 border-t border-line pt-10">
-            <StatBlock value={30} suffix="天" label="平均尽调周期" note="AVERAGE DD CYCLE" />
-            <StatBlock value={2.1} decimals={1} suffix="%" label="平均 PR 提升" note="AVG PR IMPROVEMENT" />
+            <Reveal delay={200}>
+              <p className="font-serif text-2xl font-bold text-paper">高效交割执行</p>
+              <p className="mt-2 text-sm leading-6 text-mist">
+                标准化尽调流程与 AI 辅助定价，让交易决策快速而确定。
+              </p>
+              <p className="mt-2 font-mono text-[10px] tracking-[0.15em] text-dim">
+                DEAL EXECUTION
+              </p>
+            </Reveal>
+            <Reveal delay={300}>
+              <p className="font-serif text-2xl font-bold text-paper">精细化发电提升管理</p>
+              <p className="mt-2 text-sm leading-6 text-mist">
+                集控监控与技改增效并举，持续兑现电站资产价值。
+              </p>
+              <p className="mt-2 font-mono text-[10px] tracking-[0.15em] text-dim">
+                PERFORMANCE MANAGEMENT
+              </p>
+            </Reveal>
           </div>
         </div>
 
@@ -439,7 +454,7 @@ function BusinessCTA() {
 
 export default function Business() {
   useEffect(() => {
-    document.title = '业务领域 — 光伏风电储能投资·并购·运营 | 泰坦能源'
+    document.title = '业务领域 — 光伏风电储能投资·并购·运营 | 彭田环保'
   }, [])
 
   return (
@@ -454,7 +469,7 @@ export default function Business() {
             </span>
           </>
         }
-        lead="泰坦能源围绕三类核心资产，构建『投得准、并得进、管得好』的一体化能力闭环。"
+        lead="彭田环保围绕三类核心资产，构建『投得准、并得进、管得好』的一体化能力闭环。"
         image="/business-wind.jpg"
         coord="MODE × ASSET MATRIX / 3 × 3"
       />

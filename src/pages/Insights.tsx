@@ -29,7 +29,7 @@ export default function Insights() {
 
   // SEO
   useEffect(() => {
-    document.title = '前沿技术洞察 — 核能·氢能·储能海外前沿视频 AI 解读 | 泰坦能源'
+    document.title = '前沿技术洞察 — 核能·氢能·储能海外前沿视频 AI 解读 | 彭田环保'
     const meta = document.querySelector('meta[name="description"]')
     if (meta) {
       meta.setAttribute(

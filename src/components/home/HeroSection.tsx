@@ -11,10 +11,10 @@ const EnergyGlobe = lazy(() => import('./EnergyGlobe'))
 const TITLE = '驭光 · 捕风 · 储未来'
 
 const HERO_STATS = [
-  { label: '累计管理装机', value: '1.2 GW+' },
-  { label: '在运电站', value: '38 座' },
-  { label: '覆盖省份', value: '12 个' },
-  { label: '年减排 CO₂', value: '150 万吨' },
+  { label: '业务聚焦', value: '光伏 · 风电 · 储能' },
+  { label: '业务模式', value: '投资 · 并购 · 运营' },
+  { label: '投资方法论', value: 'AI 驱动评估' },
+  { label: '持有理念', value: '长期主义 · 全周期' },
 ]
 
 /** 静态星点背景（150 颗 1px 白点） */
@@ -150,7 +150,7 @@ export default function HeroSection() {
             让每一度绿电，都值得投资
           </p>
           <p className="hero-fade mt-6 max-w-xl text-lg leading-[1.8] text-mist opacity-0">
-            泰坦能源专注光伏、风电与储能电站的投资、并购与运营，以资本与专业运营能力，加速中国分布式能源的价值释放。
+            彭田环保专注光伏、风电与储能电站的投资、并购与运营，以资本与专业运营能力，加速中国分布式能源的价值释放。
           </p>
           <div className="hero-fade mt-10 flex flex-wrap gap-4 opacity-0">
             <Link

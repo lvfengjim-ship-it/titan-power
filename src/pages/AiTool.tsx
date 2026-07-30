@@ -28,7 +28,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '支持哪些项目类型？',
-    a: '当前支持集中式/分布式光伏、陆上风电、独立储能（容量租赁 + 现货套利模式）。海上风电与源网荷储一体化模型正在规划中。',
+    a: '当前支持分布式光伏、分散式风电、工商业储能与独立储能（容量租赁 + 现货套利模式）。风光储一体化模型正在规划中。',
   },
   {
     q: '收费标准？',
@@ -47,7 +47,7 @@ export default function AiTool() {
 
   // SEO
   useEffect(() => {
-    document.title = 'AI 投资评估工具 — 免费测算 IRR / LCOE / 回收期 | 泰坦能源'
+    document.title = 'AI 投资评估工具 — 免费测算 IRR / LCOE / 回收期 | 彭田环保'
     let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]')
     if (!meta) {
       meta = document.createElement('meta')
@@ -262,7 +262,7 @@ export default function AiTool() {
               测算满意？让我们继续聊聊这个项目
             </h3>
             <p className="mt-4 text-base leading-7 text-mist">
-              把您的测算参数带给泰坦能源投资团队，我们将为您提供资源评估、交易结构与并购尽调的深度支持。
+              把您的测算参数带给彭田环保投资团队，我们将为您提供资源评估、交易结构与并购尽调的深度支持。
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
@@ -274,10 +274,10 @@ export default function AiTool() {
               预约项目洽谈
             </Link>
             <Link
-              to="/projects"
+              to="/business"
               className="group flex items-center gap-2 rounded-xl border border-line-strong px-7 py-3.5 text-sm font-medium text-paper transition-all duration-300 hover:border-solar-400 hover:bg-solar-400/[0.08] hover:text-solar-300"
             >
-              浏览项目案例
+              了解业务领域
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>

@@ -78,7 +78,7 @@ export default function ReportPanel({ type, report, onRetry }: Props) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `titan-power-ai-report-${Date.now()}.md`
+    a.download = `pt-momentum-ai-report-${Date.now()}.md`
     a.click()
     URL.revokeObjectURL(url)
     toast.success('Markdown 报告已开始下载')

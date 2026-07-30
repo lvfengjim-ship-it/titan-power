@@ -19,7 +19,7 @@ export default function SubscribeSection() {
                 前沿解读，同步抵达你的微信
               </h3>
               <p className="mt-4 text-base leading-7 text-mist">
-                泰坦能源公众号与视频号即将开通。每日精选的前沿技术解读、AI
+                彭田环保公众号与视频号即将开通。每日精选的前沿技术解读、AI
                 评估工具更新与行业动态，将第一时间推送。
               </p>
               <p className="mt-5 flex items-center gap-2 text-sm font-medium text-volt-300">
@@ -33,7 +33,7 @@ export default function SubscribeSection() {
                 <QRConnectCard
                   src="/qr-wechat-official.png"
                   platform="公众号"
-                  title="泰坦能源·公众号"
+                  title="彭田环保·公众号"
                   accent="gold"
                 />
               </div>
@@ -41,7 +41,7 @@ export default function SubscribeSection() {
                 <QRConnectCard
                   src="/qr-wechat-channel.png"
                   platform="视频号"
-                  title="泰坦能源·视频号"
+                  title="彭田环保·视频号"
                   accent="volt"
                 />
               </div>

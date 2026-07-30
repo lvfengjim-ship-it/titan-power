@@ -8,7 +8,6 @@ export const NAV_LINKS = [
   { to: '/', label: '首页' },
   { to: '/about', label: '关于我们' },
   { to: '/business', label: '业务领域' },
-  { to: '/projects', label: '项目案例' },
   { to: '/insights', label: '前沿洞察' },
   { to: '/contact', label: '联系我们' },
 ]
@@ -43,11 +42,11 @@ export default function Navbar() {
       <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-10">
         {/* brand */}
         <Link to="/" className="group flex items-center gap-3">
-          <img src="/logo.svg" alt="泰坦能源" className="h-8 w-8" />
+          <img src="/logo.svg" alt="彭田环保" className="h-8 w-8" />
           <span className="flex flex-col leading-none">
-            <span className="font-serif text-lg font-bold text-paper">泰坦能源</span>
+            <span className="font-serif text-lg font-bold text-paper">彭田环保</span>
             <span className="mt-1 font-display text-[10px] font-medium tracking-[0.3em] text-dim">
-              TITAN POWER
+              PT MOMENTUM
             </span>
           </span>
         </Link>
@@ -120,7 +119,7 @@ export default function Navbar() {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-center justify-between">
-                <img src="/logo.svg" alt="泰坦能源" className="h-8 w-8" />
+                <img src="/logo.svg" alt="彭田环保" className="h-8 w-8" />
                 <button onClick={() => setOpen(false)} aria-label="关闭菜单" className="text-mist">
                   <X className="h-6 w-6" />
                 </button>

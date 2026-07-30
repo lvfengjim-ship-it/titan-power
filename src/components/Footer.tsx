@@ -5,7 +5,6 @@ const NAV = [
   { to: '/', label: '首页' },
   { to: '/about', label: '关于我们' },
   { to: '/business', label: '业务领域' },
-  { to: '/projects', label: '项目案例' },
   { to: '/insights', label: '前沿洞察' },
   { to: '/contact', label: '联系我们' },
 ]
@@ -45,11 +44,11 @@ export default function Footer() {
           {/* brand */}
           <div>
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="泰坦能源" className="h-9 w-9" />
+              <img src="/logo.svg" alt="彭田环保" className="h-9 w-9" />
               <div className="leading-none">
-                <p className="font-serif text-lg font-bold text-paper">泰坦能源</p>
+                <p className="font-serif text-lg font-bold text-paper">彭田环保</p>
                 <p className="mt-1 font-display text-[10px] font-medium tracking-[0.3em] text-dim">
-                  TITAN POWER
+                  PT MOMENTUM
                 </p>
               </div>
             </div>
@@ -57,7 +56,7 @@ export default function Footer() {
               专注光伏、风电、储能电站的投资、并购与运营。
             </p>
             <p className="mt-6 font-mono text-xs text-dim">京ICP备00000000号-1</p>
-            <p className="mt-1 text-xs text-dim">© 2025 泰坦能源投资有限公司</p>
+            <p className="mt-1 text-xs text-dim">© 2026 海南彭田环保科技有限公司</p>
           </div>
 
           {/* nav */}

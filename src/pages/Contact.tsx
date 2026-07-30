@@ -15,7 +15,7 @@ export default function Contact() {
       <PageHero
         breadcrumb={['首页', '联系我们']}
         title="让我们谈谈您的项目"
-        lead="无论是项目合作、电站出售、资金合作还是加入泰坦，我们承诺 48 小时内响应。"
+        lead="无论是项目合作、电站出售、资金合作还是加入彭田，我们承诺 48 小时内响应。"
         image="/cta-band-bg.jpg"
         coord="RESPONSE WITHIN 48H"
       />

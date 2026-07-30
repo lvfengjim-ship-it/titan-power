@@ -55,7 +55,7 @@ export default function QRConnectCard({
     >
       <img src={src} alt={platform} className="h-24 w-24 rounded-xl" width={96} height={96} />
       <div>
-        <p className="font-sans text-base font-bold text-paper">{title ?? `泰坦能源·${platform}`}</p>
+        <p className="font-sans text-base font-bold text-paper">{title ?? `彭田环保·${platform}`}</p>
         <span
           className={cn(
             'mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[11px]',

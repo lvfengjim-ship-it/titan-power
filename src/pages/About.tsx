@@ -9,11 +9,13 @@ import {
   Telescope,
   Compass,
   ArrowRight,
+  Leaf,
+  HeartHandshake,
+  ShieldCheck,
 } from 'lucide-react'
 import PageHero from '@/components/PageHero'
 import SectionHeading from '@/components/SectionHeading'
 import GlowCard from '@/components/GlowCard'
-import StatBlock from '@/components/StatBlock'
 import Reveal from '@/components/Reveal'
 import { cn } from '@/lib/utils'
 
@@ -22,8 +24,8 @@ const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
 /* ---------------- Section 2 — 公司概览 ---------------- */
 
 const HIGHLIGHTS = [
-  { icon: Building2, text: '总部北京 · 多地办事处' },
-  { icon: Users, text: '核心团队 60+ 人' },
+  { icon: Building2, text: '总部位于海南 · 辐射全国重点区域' },
+  { icon: Users, text: '产业与金融复合背景的核心团队' },
   { icon: Award, text: '新能源投资新锐机构（占位）' },
 ]
 
@@ -36,18 +38,17 @@ function Overview() {
           <div className="lg:sticky lg:top-24">
             <Reveal>
               <h2 className="font-serif text-[clamp(1.75rem,3.2vw,2.5rem)] font-bold leading-[1.2] text-paper">
-                泰坦能源，让绿色资产持续生长
+                彭田环保，让绿色资产持续生长
               </h2>
             </Reveal>
             <Reveal delay={100}>
               <p className="mt-6 leading-[1.85] text-mist">
-                泰坦能源成立于 2016 年，总部位于北京，是一家聚焦新能源电站资产的专业投资运营商。公司以『投资—并购—运营』一体化模式，累计投资规模逾
-                45 亿元，管理光伏、风电及储能电站 38 座，总装机容量超过 1.2 GW。
+                彭田环保是一家聚焦新能源电站资产的专业投资运营商。公司以『投资—并购—运营』一体化模式，长期持有并精细化运营光伏、风电及储能电站资产。
               </p>
             </Reveal>
             <Reveal delay={200}>
               <p className="mt-4 leading-[1.85] text-mist">
-                我们相信，能源转型的确定性来自两点：优质的资产，与精益的运营。泰坦能源以金融的严谨与产业的耐心，陪伴每一座电站穿越
+                我们相信，能源转型的确定性来自两点：优质的资产，与精益的运营。彭田环保以金融的严谨与产业的耐心，陪伴每一座电站穿越
                 25 年的生命周期。
               </p>
             </Reveal>
@@ -77,12 +78,12 @@ function Overview() {
           >
             <img
               src="/about-control-room.jpg"
-              alt="泰坦能源智慧集控中心"
+              alt="彭田环保智慧集控中心"
               className="aspect-video w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
             />
           </motion.div>
           <p className="mt-3 font-mono text-xs tracking-[0.08em] text-dim">
-            TITAN OCC · 智慧集控中心
+            PT OCC · 智慧集控中心
           </p>
 
           <motion.div
@@ -165,11 +166,11 @@ function Mission() {
 /* ---------------- Section 4 — 发展历程（时间轴） ---------------- */
 
 const MILESTONES = [
-  { year: '2016', title: '公司成立', desc: '首个分布式光伏项目投资落地（浙江）。' },
-  { year: '2018', title: '首轮融资', desc: '完成首轮机构融资，管理规模突破 10 亿元。' },
-  { year: '2020', title: '进入风电领域', desc: '内蒙古 200MW 风电项目并网。' },
-  { year: '2022', title: '并购业务成型', desc: '完成首批 3 座存量电站收购；智慧集控中心投运。' },
-  { year: '2023', title: '布局独立储能', desc: '江苏 200MWh 电网侧储能电站投运；管理装机突破 1GW。' },
+  { year: '2016', title: '公司成立', desc: '首个分布式光伏项目投资落地。' },
+  { year: '2018', title: '首轮融资', desc: '完成首轮机构融资，投资能力再上台阶。' },
+  { year: '2020', title: '进入风电领域', desc: '首批风电项目顺利并网。' },
+  { year: '2022', title: '并购业务成型', desc: '完成首批存量电站收购；智慧集控中心投运。' },
+  { year: '2023', title: '布局独立储能', desc: '首个电网侧独立储能电站投运，储能布局落地。' },
   { year: '2025', title: '开放平台能力', desc: '发布 AI 投资评估工具与前沿技术洞察平台，开放行业共享。' },
 ]
 
@@ -244,13 +245,13 @@ const TEAM = [
     img: '/team-1.jpg',
     name: '陈屹川',
     role: '创始人 & CEO',
-    bio: '曾任大型能源央企投资部负责人，主导超 80 亿元新能源项目投资。',
+    bio: '曾任大型能源央企投资部负责人，主导多个大型新能源项目投资。',
   },
   {
     img: '/team-2.jpg',
     name: '苏明蔚',
     role: '合伙人 · 投资负责人',
-    bio: '深耕新能源并购 12 年，完成 20+ 电站交易。',
+    bio: '深耕新能源并购多年，完成多笔电站交易。',
   },
   {
     img: '/team-3.jpg',
@@ -262,7 +263,7 @@ const TEAM = [
     img: '/team-4.jpg',
     name: '郑拓野',
     role: 'COO · 运营负责人',
-    bio: '管理过 3GW 存量电站运营，电力市场化交易专家。',
+    bio: '曾管理大规模存量电站运营，电力市场化交易专家。',
   },
 ]
 
@@ -350,14 +351,45 @@ function HonorsEsg() {
           <Reveal>
             <h3 className="text-xl font-bold text-paper lg:text-2xl">ESG 承诺</h3>
           </Reveal>
-          <div className="mt-8 grid grid-cols-3 gap-6">
-            <StatBlock value={150} suffix="万吨" label="年 CO₂ 减排" note="CO₂ REDUCTION / YR" />
-            <StatBlock value={1800} suffix="户" label="光伏惠民覆盖农户" note="RURAL HOUSEHOLDS" />
-            <StatBlock value={100} suffix="%" label="水土保持达标率" note="SOIL CONSERVATION" />
+          <div className="mt-8 space-y-4">
+            {[
+              {
+                icon: Leaf,
+                k: '绿色使命',
+                v: '将环境因素纳入每一项投资决策，从选址生态评估到运维期水土保持，让清洁电力持续生长。',
+              },
+              {
+                icon: HeartHandshake,
+                k: '社区共建',
+                v: '与电站所在社区长期同行，通过光伏惠民与属地协作，让绿色资产惠及更多人。',
+              },
+              {
+                icon: ShieldCheck,
+                k: '合规治理',
+                v: '以规范的治理结构与透明的决策流程为底线，用合规守护每一份长期信任。',
+              },
+            ].map((c, i) => (
+              <motion.div
+                key={c.k}
+                className="flex items-start gap-4 rounded-xl border border-line bg-ink-800 px-5 py-4 transition-colors duration-300 hover:border-line-strong"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-15% 0px' }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: EASE }}
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-ink-850 text-solar-400">
+                  <c.icon className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-paper">{c.k}</p>
+                  <p className="mt-1 text-xs leading-6 text-mist">{c.v}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
           <Reveal delay={200}>
             <p className="mt-8 border-t border-line pt-6 text-sm leading-7 text-mist">
-              我们将环境、社会与治理因素纳入每一项投资决策：从电站选址的生态评估，到运维期的水土保持与社区共建，再到光伏惠民工程的长期投入。泰坦能源相信，可持续的回报只来自可持续的经营。（占位文案）
+              我们将环境、社会与治理因素纳入每一项投资决策：从电站选址的生态评估，到运维期的水土保持与社区共建，再到光伏惠民工程的长期投入。彭田环保相信，可持续的回报只来自可持续的经营。（占位文案）
             </p>
           </Reveal>
         </div>
@@ -379,7 +411,7 @@ function AboutCTA() {
       <div className="relative mx-auto flex max-w-[1280px] flex-col items-start justify-between gap-10 px-6 py-20 lg:flex-row lg:items-center lg:px-10">
         <Reveal>
           <h3 className="font-serif text-2xl font-bold leading-snug text-paper lg:text-3xl">
-            与泰坦同行，共赴能源转型
+            与彭田同行，共赴能源转型
           </h3>
           <p className="mt-4 max-w-xl text-base leading-7 text-mist">
             了解我们的业务模式与能力体系，或直接与我们联系，探讨合作的可能。
@@ -411,7 +443,7 @@ function AboutCTA() {
 
 export default function About() {
   useEffect(() => {
-    document.title = '关于我们 — 泰坦能源 Titan Power'
+    document.title = '关于我们 — 彭田环保 PT Momentum'
   }, [])
 
   return (
@@ -419,7 +451,7 @@ export default function About() {
       <PageHero
         breadcrumb={['首页', '关于我们']}
         title="以产业深度，做能源资产的长期持有者"
-        lead="泰坦能源投资有限公司是一家专注于分布式能源领域的投资运营商，业务覆盖光伏、风电、储能电站的投资、并购与全生命周期运营。"
+        lead="海南彭田环保科技有限公司是一家专注于分布式能源领域的投资运营商，业务覆盖光伏、风电、储能电站的投资、并购与全生命周期运营。"
         image="/about-hero.jpg"
         coord="39.9042° N · 116.4074° E / EST. 2016"
       />

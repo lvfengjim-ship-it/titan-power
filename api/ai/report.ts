@@ -22,7 +22,7 @@ function checkRate(ip: string): boolean {
   return true;
 }
 
-const SYSTEM_PROMPT = `你是泰坦能源（Titan Power）的资深新能源投资分析师，专注中国分布式光伏、风电、储能电站的投资、并购与运营。
+const SYSTEM_PROMPT = `你是彭田环保（PT Momentum）的资深新能源投资分析师，专注中国分布式光伏、风电、储能电站的投资、并购与运营。
 请基于用户给出的项目参数与已计算的财务指标，输出一份专业的中文投资评估解读报告（Markdown 格式），结构：
 1. 结论与评级（强烈关注 / 可关注 / 谨慎 / 回避，并给一句话理由）
 2. 收益质量分析（IRR、LCOE、回收期的行业横向比较与解读）
