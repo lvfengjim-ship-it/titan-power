@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { cn } from '@/lib/utils'
@@ -28,7 +28,10 @@ export default function PhilosophySection() {
   const root = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
 
-  useEffect(() => {
+  // 必须用 useLayoutEffect：pin 会把 section 移进 pin-spacer（脱离 <main>），
+  // 清理必须在 React 提交删除之前同步 revert 回原始父节点，
+  // 否则 React removeChild 找不到节点抛错，导致整棵 React 树被卸载（页面空白）。
+  useLayoutEffect(() => {
     if (!root.current) return
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const ctx = gsap.context(() => {

@@ -6,16 +6,13 @@
       <stop offset="1" stop-color="#E8862A"/>
     </linearGradient>
     <filter id="pt-glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="1.6" result="b"/>
+      <feGaussianBlur stdDeviation="1.4" result="b"/>
       <feMerge>
         <feMergeNode in="b"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
-  <!-- PTM 风格斜体 T：横梁左侧斜切下挂，竖笔斜体动势 -->
-  <g filter="url(#pt-glow)" fill="url(#pt-gold)">
-    <path d="M13 11 L57 11 L53 22 L33 22 L27 31 L11 31 Z"/>
-    <path d="M31 22 L45 22 L35 56 L21 56 Z"/>
-  </g>
+  <!-- PTM 字母组合标志：轮廓描摹自彭田新材料官方 logo -->
+  <path filter="url(#pt-glow)" fill="url(#pt-gold)" d="M59.1 8.7 L28.9 11.1 L4.0 18.1 L4.7 20.1 L8.6 22.5 L25.7 21.8 L22.6 36.5 L27.0 40.6 L25.9 55.3 L37.7 35.0 L37.2 33.2 L33.1 31.5 L34.8 26.2 L37.7 25.3 L44.2 27.5 L46.4 26.4 L45.8 24.2 L39.2 21.2 L38.3 18.8 L58.5 13.1 L60.0 11.8 Z"/>
 </svg>

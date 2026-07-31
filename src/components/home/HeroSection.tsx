@@ -126,7 +126,7 @@ export default function HeroSection() {
 
       {/* coordinates */}
       <span className="absolute left-6 top-24 z-10 font-mono text-[10px] tracking-[0.15em] text-dim lg:left-10">
-        39.9042° N · 116.4074° E / BEIJING HQ
+        20.0440° N · 110.1989° E / HAIKOU HQ
       </span>
 
       {/* foreground */}

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import Lenis from 'lenis'
 import gsap from 'gsap'
@@ -42,9 +42,12 @@ export default function Layout() {
     }
   }, [])
 
-  // scroll to top on route change
-  useEffect(() => {
+  // scroll to top on route change —— 必须在绘制前瞬时完成：
+  // 1) useLayoutEffect 在浏览器绘制前执行，避免新页面在旧滚动位置先绘一帧“空白”
+  // 2) Lenis 内部维护自己的滚动值，原生 scrollTo 会被它下一帧覆盖，必须 immediate 强制归零
+  useLayoutEffect(() => {
     window.scrollTo(0, 0)
+    lenisRef.current?.scrollTo(0, { immediate: true, force: true })
   }, [location.pathname])
 
   useEffect(() => {
