@@ -18,7 +18,7 @@ export interface ReportState {
 /** 错误码 → 友好提示 */
 function friendlyError(status: number, fallback: string): string {
   if (status === 429) return '已达到今日免费评估次数上限（20 次/日），请明天再试'
-  if (status === 503) return 'AI 服务未配置（服务端缺少 DEEPSEEK_API_KEY），请稍后再试'
+  if (status === 503) return 'AI 服务未配置，请稍后再试'
   if (status === 502) return 'AI 上游服务暂时不可用，请稍后重试'
   return fallback || 'AI 服务暂时繁忙，请稍后重试'
 }

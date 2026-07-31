@@ -39,7 +39,7 @@ export async function aiReportHandler(c: Context) {
     "anonymous";
 
   if (!hasDeepSeekKey()) {
-    return c.json({ error: "AI 服务未配置（缺少 DEEPSEEK_API_KEY）" }, 503);
+    return c.json({ error: "AI 服务未配置" }, 503);
   }
   if (!checkRate(ip)) {
     return c.json({ error: "已达到今日免费评估次数上限（20 次/日），请明天再来" }, 429);
