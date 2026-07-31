@@ -54,9 +54,9 @@ const MapPinDot = memo(function MapPinDot({
 })
 
 const OFFICES = [
-  { name: '北京总部', role: '投资决策 · 并购交易 · 数字化平台' },
-  { name: '华东办事处（南京，占位）', role: '分布式项目开发 · 运维响应' },
-  { name: '西北办事处（兰州，占位）', role: '大基地项目管理 · 政府事务' },
+  { name: '海口总部（华南）', role: '投资决策 · 并购交易 · 数字化平台' },
+  { name: '华东区（上海 · 温州 · 镇江）', role: '分布式项目开发 · 运维响应' },
+  { name: '华北区（北京 · 青岛）', role: '项目管理 · 政府事务' },
 ]
 
 /** Section 3 — 总部与区域布局：抽象版图 + 机构行 */
@@ -68,7 +68,7 @@ export default function OfficeMap() {
         <SectionHeading
           eyebrow="OFFICES"
           title="总部与区域布局"
-          description="以北京为投资决策中枢，华东、西北两大区域机构贴近项目一线，形成覆盖全国主要资源区的响应网络。"
+          description="以海口为投资决策中枢，华东、华北两大区域机构贴近项目一线，形成华东、华南、华北主要业务区域的响应网络。"
         />
       </Reveal>
 
@@ -89,10 +89,10 @@ export default function OfficeMap() {
                 className="h-auto w-full select-none opacity-90"
                 draggable={false}
               />
-              {/* 北京 HQ · 华东（南京）· 西北（兰州） */}
-              <MapPinDot x={67.7} y={37.4} tone="gold" label="北京 HQ" delay={0.3} />
-              <MapPinDot x={71.2} y={55.9} tone="volt" label="华东 · 南京" delay={0.45} />
-              <MapPinDot x={49.3} y={46.4} tone="volt" label="西北 · 兰州" delay={0.6} />
+              {/* 海口 HQ · 华东（上海）· 华北（北京） */}
+              <MapPinDot x={59.5} y={82.5} tone="gold" label="海口 HQ" delay={0.3} />
+              <MapPinDot x={73.5} y={52.5} tone="volt" label="华东 · 上海" delay={0.45} />
+              <MapPinDot x={67.7} y={37.4} tone="volt" label="华北 · 北京" delay={0.6} />
             </motion.div>
             <p className="mt-4 font-mono text-[10px] tracking-[0.15em] text-dim">
               HEADQUARTERS & REGIONAL OFFICES · DOT MAP ILLUSTRATION

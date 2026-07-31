@@ -24,7 +24,7 @@ const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
 /* ---------------- Section 2 — 公司概览 ---------------- */
 
 const HIGHLIGHTS = [
-  { icon: Building2, text: '总部位于海南 · 辐射全国重点区域' },
+  { icon: Building2, text: '总部位于海口 · 华东·华南·华北响应网络' },
   { icon: Users, text: '产业与金融复合背景的核心团队' },
   { icon: Award, text: '新能源投资新锐机构（占位）' },
 ]

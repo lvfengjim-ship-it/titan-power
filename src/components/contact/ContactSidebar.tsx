@@ -1,13 +1,13 @@
 import { Link } from 'react-router'
-import { MapPin, Mail, Phone, Clock, Sparkles, ArrowRight } from 'lucide-react'
+import { MapPin, Mail, Building2, Clock, Sparkles, ArrowRight } from 'lucide-react'
 import GlowCard from '@/components/GlowCard'
 import QRConnectCard from '@/components/QRConnectCard'
 import Reveal from '@/components/Reveal'
 
 const CONTACT_ROWS = [
-  { icon: MapPin, label: '地址', value: '海南省海南生态软件园A17幢' },
+  { icon: MapPin, label: '总部地址', value: '海南省海南生态软件园A17幢' },
+  { icon: Building2, label: '区域办事处', value: '北京 · 上海 · 青岛 · 温州 · 镇江' },
   { icon: Mail, label: '邮箱', value: 'sales@titan-power.cn' },
-  { icon: Phone, label: '电话', value: '010-0000-0000（占位）' },
   { icon: Clock, label: '工作时间', value: '工作日 9:00–18:00' },
 ]
 
