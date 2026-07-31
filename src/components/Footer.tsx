@@ -115,10 +115,10 @@ export default function Footer() {
               />
             </div>
             <a
-              href="mailto:contact@titan-power.cn"
+              href="mailto:sales@titan-power.cn"
               className="mt-5 block font-mono text-sm text-mist transition-colors hover:text-paper"
             >
-              contact@titan-power.cn
+              sales@titan-power.cn
             </a>
           </div>
         </div>

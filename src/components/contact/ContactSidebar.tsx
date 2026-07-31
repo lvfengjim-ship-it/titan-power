@@ -5,8 +5,8 @@ import QRConnectCard from '@/components/QRConnectCard'
 import Reveal from '@/components/Reveal'
 
 const CONTACT_ROWS = [
-  { icon: MapPin, label: '地址', value: '北京市朝阳区（占位地址）' },
-  { icon: Mail, label: '邮箱', value: 'contact@titan-power.cn' },
+  { icon: MapPin, label: '地址', value: '海南省海南生态软件园A17幢' },
+  { icon: Mail, label: '邮箱', value: 'sales@titan-power.cn' },
   { icon: Phone, label: '电话', value: '010-0000-0000（占位）' },
   { icon: Clock, label: '工作时间', value: '工作日 9:00–18:00' },
 ]

@@ -79,7 +79,7 @@ export default function ContactForm() {
       setSubmitted(true)
     },
     onError: () => {
-      toast.error('提交失败，请稍后重试或直接邮件 contact@titan-power.cn')
+      toast.error('提交失败，请稍后重试或直接邮件 sales@titan-power.cn')
     },
   })
 
