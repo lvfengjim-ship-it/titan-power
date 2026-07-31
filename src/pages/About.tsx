@@ -166,12 +166,9 @@ function Mission() {
 /* ---------------- Section 4 — 发展历程（时间轴） ---------------- */
 
 const MILESTONES = [
-  { year: '2016', title: '公司成立', desc: '首个分布式光伏项目投资落地。' },
-  { year: '2018', title: '首轮融资', desc: '完成首轮机构融资，投资能力再上台阶。' },
-  { year: '2020', title: '进入风电领域', desc: '首批风电项目顺利并网。' },
-  { year: '2022', title: '并购业务成型', desc: '完成首批存量电站收购；智慧集控中心投运。' },
-  { year: '2023', title: '布局独立储能', desc: '首个电网侧独立储能电站投运，储能布局落地。' },
-  { year: '2025', title: '开放平台能力', desc: '发布 AI 投资评估工具与前沿技术洞察平台，开放行业共享。' },
+  { year: '2022', title: '公司成立', desc: '专注环保废水处理领域。' },
+  { year: '2023', title: '进入新能源领域', desc: '战略布局分布式新能源，开启绿色资产投资之路。' },
+  { year: '2024', title: '启动分布式新能源并购', desc: '启动分布式光伏、风电、储能电站资产的并购整合。' },
 ]
 
 function Timeline() {
@@ -238,114 +235,12 @@ function Timeline() {
   )
 }
 
-/* ---------------- Section 5 — 核心团队 ---------------- */
-
-const TEAM = [
-  {
-    img: '/team-1.jpg',
-    name: '陈屹川',
-    role: '创始人 & CEO',
-    bio: '曾任大型能源央企投资部负责人，主导多个大型新能源项目投资。',
-  },
-  {
-    img: '/team-2.jpg',
-    name: '苏明蔚',
-    role: '合伙人 · 投资负责人',
-    bio: '深耕新能源并购多年，完成多笔电站交易。',
-  },
-  {
-    img: '/team-3.jpg',
-    name: '高劲风',
-    role: 'CTO · 技术与数字化负责人',
-    bio: '前头部整机商研发总监，主导智慧运维平台建设。',
-  },
-  {
-    img: '/team-4.jpg',
-    name: '郑拓野',
-    role: 'COO · 运营负责人',
-    bio: '曾管理大规模存量电站运营，电力市场化交易专家。',
-  },
-]
-
-function Team() {
-  return (
-    <section className="bg-ink-900 py-24 lg:py-32">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-        <Reveal>
-          <SectionHeading
-            eyebrow="LEADERSHIP"
-            title="核心团队"
-            description="兼具产业运营与金融投资基因的复合型团队。"
-          />
-        </Reveal>
-
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {TEAM.map((t, i) => (
-            <Reveal key={t.name} delay={i * 100}>
-              <div className="group relative overflow-hidden rounded-2xl border border-line bg-ink-800 transition-all duration-500 hover:-translate-y-1.5 hover:border-line-strong">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={t.img}
-                    alt={t.name}
-                    className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-800" />
-                  {/* bottom gold edge */}
-                  <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-solar-400 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                </div>
-                <div className="relative -mt-10 p-6">
-                  <h3 className="font-serif text-xl font-bold text-paper">{t.name}</h3>
-                  <p className="mt-1 text-sm font-medium text-solar-400">{t.role}</p>
-                  <p className="mt-3 text-sm leading-6 text-mist line-clamp-2 transition-all duration-500 group-hover:line-clamp-none">
-                    {t.bio}
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ---------------- Section 6 — 资质荣誉 + ESG ---------------- */
-
-const HONORS = [
-  '电力工程施工总承包资质',
-  '高新技术企业',
-  '中国可再生能源学会会员单位',
-  '年度最佳新能源投资机构（占位）',
-  'ISO 9001 质量管理体系',
-  '安全生产标准化二级',
-]
+/* ---------------- Section 6 — ESG 承诺 ---------------- */
 
 function HonorsEsg() {
   return (
     <section className="py-24">
-      <div className="mx-auto grid max-w-[1280px] gap-16 px-6 lg:grid-cols-2 lg:px-10">
-        {/* honors */}
-        <div>
-          <Reveal>
-            <h3 className="text-xl font-bold text-paper lg:text-2xl">资质与荣誉</h3>
-          </Reveal>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {HONORS.map((h, i) => (
-              <motion.div
-                key={h}
-                className="flex items-center gap-3 rounded-xl border border-line bg-ink-800 px-5 py-4 transition-colors duration-300 hover:border-line-strong"
-                initial={{ opacity: 0, scale: 0.92 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-15% 0px' }}
-                transition={{ duration: 0.6, delay: i * 0.06, ease: EASE }}
-              >
-                <Award className="h-5 w-5 shrink-0 text-solar-400" />
-                <span className="text-sm font-medium text-paper">{h}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
+      <div className="mx-auto grid max-w-[1280px] gap-16 px-6 lg:px-10">
         {/* ESG */}
         <div>
           <Reveal>
@@ -453,12 +348,11 @@ export default function About() {
         title="以产业深度，做能源资产的长期持有者"
         lead="海南彭田环保科技有限公司是一家专注于分布式能源领域的投资运营商，业务覆盖光伏、风电、储能电站的投资、并购与全生命周期运营。"
         image="/about-hero.jpg"
-        coord="39.9042° N · 116.4074° E / EST. 2016"
+        coord="20.0440° N · 110.1989° E / EST. 2022"
       />
       <Overview />
       <Mission />
       <Timeline />
-      <Team />
       <HonorsEsg />
       <AboutCTA />
     </>

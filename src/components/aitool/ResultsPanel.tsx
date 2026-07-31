@@ -414,10 +414,10 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
           )}
         >
           <Sparkles className={cn('h-5 w-5', generating && 'animate-pulse')} />
-          {generating ? 'DeepSeek 正在生成报告…' : '生成 AI 投资解读报告'}
+          {generating ? 'AI 正在生成报告…' : '生成 AI 投资解读报告'}
         </button>
         <p className="mt-3 text-center text-xs text-dim">
-          由 DeepSeek 大模型基于您的参数与测算结果生成 · 每 IP 每日限 20 次
+          由 AI 大模型基于您的参数与测算结果生成 · 每 IP 每日限 20 次
         </p>
       </div>
     </div>

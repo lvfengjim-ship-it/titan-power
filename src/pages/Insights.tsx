@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Rss, SearchX, Sparkles, Youtube } from 'lucide-react'
+import { Globe, Rss, SearchX, Sparkles } from 'lucide-react'
 import { trpc } from '@/providers/trpc'
 import CTABand from '@/components/CTABand'
 import FilterBar from '@/components/insights/FilterBar'
@@ -34,7 +34,7 @@ export default function Insights() {
     if (meta) {
       meta.setAttribute(
         'content',
-        '每日自动聚合海外核能、氢能、储能、光伏、风电前沿技术视频，DeepSeek AI 中文解读，免费的行业技术普及平台。',
+        '每日自动聚合海外核能、氢能、储能、光伏、风电前沿技术视频，AI 中文解读，免费的行业技术普及平台。',
       )
     }
   }, [])
@@ -108,8 +108,8 @@ export default function Insights() {
 
   const heroBadges = [
     { icon: Rss, text: isFallback ? '缓存数据 · 接口恢复后自动更新' : '每日 08:00 自动更新' },
-    { icon: Youtube, text: '来源：YouTube 公开频道' },
-    { icon: Sparkles, text: 'AI 解读：DeepSeek' },
+    { icon: Globe, text: '来源：国内公开媒体以及 Youtube 公开渠道' },
+    { icon: Sparkles, text: 'AI 解读：大模型' },
   ]
 
   return (

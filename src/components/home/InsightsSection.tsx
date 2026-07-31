@@ -109,7 +109,7 @@ export default function InsightsSection() {
         <Reveal delay={100}>
           <p className="mt-8 flex items-center gap-2 text-xs text-dim">
             <Globe className="h-3.5 w-3.5" />
-            内容每日 08:00 自动更新 · 来源 YouTube 公开频道 · AI 中文解读由 DeepSeek 生成
+            内容每日 08:00 自动更新 · 来源：国内公开媒体以及 Youtube 公开渠道 · AI 中文解读
           </p>
         </Reveal>
 

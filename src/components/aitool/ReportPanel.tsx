@@ -143,7 +143,7 @@ export default function ReportPanel({ type, report, onRetry }: Props) {
               <div className="flex items-center gap-3 border-b border-line bg-ink-850 px-6 py-3 lg:px-8">
                 <Loader2 className="h-4 w-4 animate-spin text-volt-400" />
                 <p className="text-sm text-mist">
-                  DeepSeek 正在分析您的项目…
+                  AI 正在分析您的项目…
                   <span className="ml-2 text-volt-300">{STAGE_TEXTS[stage]}</span>
                 </p>
               </div>

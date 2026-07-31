@@ -4,7 +4,7 @@ import { Check, Sparkles } from 'lucide-react'
 import Reveal from '@/components/Reveal'
 import TagBadge from '@/components/TagBadge'
 
-const FEATURES = ['财务模型实时测算', 'DeepSeek AI 深度解读', '敏感性分析', '完全免费 · 无需注册']
+const FEATURES = ['财务模型实时测算', 'AI 深度解读', '敏感性分析', '完全免费 · 无需注册']
 const TYPE_TEXT = '本项目资本金内部收益率优于行业基准，建议关注电价政策与消纳风险…'
 
 /** 微缩仪表盘 mock（纯 UI，非图片） */
@@ -204,7 +204,7 @@ export default function AiToolSection() {
               </h3>
               <p className="mt-4 max-w-lg text-base leading-8 text-mist">
                 输入装机容量、利用小时、电价、造价与融资参数，即刻获得 IRR、LCOE、投资回收期等专业指标，并由
-                DeepSeek 大模型生成专属投资解读报告。
+                AI 大模型生成专属投资解读报告。
               </p>
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
                 {FEATURES.map((f) => (

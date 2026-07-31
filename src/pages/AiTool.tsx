@@ -20,7 +20,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'AI 报告是如何生成的？',
-    a: '您的项目参数与前端已计算的财务指标经后端发送至 DeepSeek 大模型，模型结合行业基准知识生成中文投资解读，并以 SSE 流式逐字返回。报告包含财务可行性、风险提示、敏感性解读与综合评级。',
+    a: '您的项目参数与前端已计算的财务指标经后端发送至 AI 大模型，模型结合行业基准知识生成中文投资解读，并以 SSE 流式逐字返回。报告包含财务可行性、风险提示、敏感性解读与综合评级。',
   },
   {
     q: '我的项目数据会被保存吗？',
@@ -63,7 +63,7 @@ export default function AiTool() {
       document.head.appendChild(meta)
     }
     meta.content =
-      '免费的新能源电站投资测算工具：输入装机、电价、造价、融资参数，实时计算 IRR、LCOE、回收期，DeepSeek AI 生成投资解读报告。'
+      '免费的新能源电站投资测算工具：输入装机、电价、造价、融资参数，实时计算 IRR、LCOE、回收期，AI 生成投资解读报告。'
   }, [])
 
   // 参数变化 → 150ms 防抖后重算
@@ -159,7 +159,7 @@ export default function AiTool() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                输入项目参数，实时测算 IRR、LCOE 与投资回收期，并由 DeepSeek
+                输入项目参数，实时测算 IRR、LCOE 与投资回收期，并由 AI
                 大模型为您生成专业投资解读。完全免费，无需注册。
               </motion.p>
             </div>
@@ -219,7 +219,7 @@ export default function AiTool() {
             eyebrow="AI REPORT"
             eyebrowColor="volt"
             title="AI 投资解读报告"
-            description="DeepSeek 大模型基于您的参数与实时测算结果，生成结构化的投资评估解读：收益质量、核心风险、敏感因素与综合评级。"
+            description="AI 大模型基于您的参数与实时测算结果，生成结构化的投资评估解读：收益质量、核心风险、敏感因素与综合评级。"
           />
         </div>
         <ReportPanel type={type} report={report} onRetry={handleGenerate} />

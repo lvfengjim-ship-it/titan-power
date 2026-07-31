@@ -150,7 +150,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                   variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
                   className="mt-6 border-t border-line pt-4 font-mono text-[10px] leading-5 tracking-[0.06em] text-dim"
                 >
-                  本解读由 DeepSeek 生成，内容来自公开视频，版权归原频道所有
+                  本解读由 AI 生成，内容来自公开视频，版权归原频道所有
                 </motion.p>
               </motion.div>
             </div>
