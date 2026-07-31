@@ -17,6 +17,8 @@
  * - 最小规模约束（UI 同步钳制）：光伏 ≥0.5 MW；储能功率 ≥0.5 MW；风电 ≥6 MW
  */
 
+import type { Lang } from '@/i18n'
+
 export type ProjectType = 'pv' | 'wind' | 'storage' | 'pvStorage'
 
 export const PROJECT_TYPE_LABEL: Record<ProjectType, string> = {
@@ -284,7 +286,10 @@ export interface YearRow {
 
 export interface SensitivityItem {
   key: string
+  /** 中文显示标签（用于 AI 报告请求等中文场景） */
   label: string
+  /** i18n 标签键（aitool.sensitivity.<labelKey>），供 UI 按界面语言显示 */
+  labelKey: string
   /** 不利方向变化后的资本金 IRR（%） */
   low: number | null
   /** 有利方向变化后的资本金 IRR（%） */
@@ -576,10 +581,19 @@ export function computeSensitivity(type: ProjectType, p: ProjectParams): Sensiti
       : type === 'pv'
         ? '电价（自用/上网）±10%'
         : '上网电价 ±10%'
+  const priceLabelKey = isStorage
+    ? 'price.storage'
+    : isPvStorage
+      ? 'price.pvStorage'
+      : type === 'pv'
+        ? 'price.pv'
+        : 'price.wind'
+  const hoursLabelKey = isStorage ? 'hours.storage' : isPvStorage ? 'hours.pvStorage' : 'hours.default'
   const raw: (SensitivityItem & { span: number })[] = [
     {
       key: 'price',
       label: priceLabel,
+      labelKey: priceLabelKey,
       low: equityIRR(type, {
         ...p,
         arbitrageSpread: isStorage ? p.arbitrageSpread * 0.9 : p.arbitrageSpread,
@@ -599,6 +613,7 @@ export function computeSensitivity(type: ProjectType, p: ProjectParams): Sensiti
     {
       key: 'capex',
       label: '单位造价 ±10%',
+      labelKey: 'capex',
       low: equityIRR(type, {
         ...p,
         unitCapex: p.unitCapex * 1.1,
@@ -614,6 +629,7 @@ export function computeSensitivity(type: ProjectType, p: ProjectParams): Sensiti
     {
       key: 'hours',
       label: isStorage ? '循环次数 ±10%' : isPvStorage ? '利用小时/循环次数 ±10%' : '利用小时 ±10%',
+      labelKey: hoursLabelKey,
       low: equityIRR(type, {
         ...p,
         utilizationHours: p.utilizationHours * 0.9,
@@ -629,6 +645,7 @@ export function computeSensitivity(type: ProjectType, p: ProjectParams): Sensiti
     {
       key: 'rate',
       label: '贷款利率 ±1pct',
+      labelKey: 'rate',
       low: equityIRR(type, { ...p, loanRate: p.loanRate + 1 }),
       high: equityIRR(type, { ...p, loanRate: Math.max(0, p.loanRate - 1) }),
       span: 0,
@@ -639,7 +656,7 @@ export function computeSensitivity(type: ProjectType, p: ProjectParams): Sensiti
   }
   return raw
     .sort((a, b) => b.span - a.span)
-    .map(({ key, label, low, high }) => ({ key, label, low, high }))
+    .map(({ key, label, labelKey, low, high }) => ({ key, label, labelKey, low, high }))
 }
 
 /* ---------- 格式化工具 ---------- */
@@ -652,23 +669,32 @@ export function fmtYears(v: number | null): string {
   return v === null ? '—' : v.toFixed(1)
 }
 
-/** 万元 → 亿元 / 万元字符串 */
-export function fmtMoneyWan(wan: number): string {
+/** 万元 → 亿元 / 万元（zh）或 CNY B / CNY k（en）字符串 */
+export function fmtMoneyWan(wan: number, lang: Lang = 'zh'): string {
   const abs = Math.abs(wan)
+  if (lang === 'en') {
+    if (abs >= 10000) return `CNY ${(wan / 100000).toFixed(2)}B`
+    return `CNY ${Math.round(wan * 10).toLocaleString('en-US')}k`
+  }
   if (abs >= 10000) return `${(wan / 10000).toFixed(2)} 亿元`
   return `${Math.round(wan).toLocaleString('zh-CN')} 万元`
 }
 
-/** MWh → 亿/万 kWh */
-export function fmtEnergy(mwh: number): string {
+/** MWh → 亿/万 kWh（zh）或 GWh / MWh / kWh（en） */
+export function fmtEnergy(mwh: number, lang: Lang = 'zh'): string {
   const kwh = mwh * 1000
+  if (lang === 'en') {
+    if (kwh >= 1e8) return `${(kwh / 1e6).toFixed(2)} GWh`
+    if (kwh >= 1e4) return `${(kwh / 1000).toFixed(0)} MWh`
+    return `${kwh.toFixed(0)} kWh`
+  }
   if (kwh >= 1e8) return `${(kwh / 1e8).toFixed(2)} 亿 kWh`
   if (kwh >= 1e4) return `${(kwh / 1e4).toFixed(0)} 万 kWh`
   return `${kwh.toFixed(0)} kWh`
 }
 
-export function fmtNumber(v: number, digits = 0): string {
-  return v.toLocaleString('zh-CN', {
+export function fmtNumber(v: number, digits = 0, lang: Lang = 'zh'): string {
+  return v.toLocaleString(lang === 'en' ? 'en-US' : 'zh-CN', {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   })

@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useLang } from '@/i18n'
 import { PROJECT_TYPE_LABEL, sanitizeParamsForReport } from './finance'
 import type { FinancialMetrics, ProjectParams, ProjectType } from './finance'
 
@@ -15,20 +16,20 @@ export interface ReportState {
   generate: (type: ProjectType, params: ProjectParams, metrics: FinancialMetrics) => void
 }
 
-/** 错误码 → 友好提示 */
-function friendlyError(status: number, fallback: string): string {
-  if (status === 429) return '已达到今日免费评估次数上限（20 次/日），请明天再试'
-  if (status === 503) return 'AI 服务未配置，请稍后再试'
-  if (status === 502) return 'AI 上游服务暂时不可用，请稍后重试'
-  return fallback || 'AI 服务暂时繁忙，请稍后重试'
+/** 错误码 → 友好提示（按界面语言） */
+function friendlyError(status: number, fallback: string, t: (key: string) => string): string {
+  if (status === 429) return t('aitool.report.err429')
+  if (status === 503) return t('aitool.report.err503')
+  if (status === 502) return t('aitool.report.err502')
+  return fallback || t('aitool.report.errBusy')
 }
 
-/** 从 Markdown 报告解析评级：优先 A+/A/B/C 徽章，其次中文评级映射 */
+/** 从 Markdown 报告解析评级：优先 A+/A/B/C 徽章，其次中文评级映射（兼容英文 "Rating"） */
 export function parseRating(md: string): string | null {
   const tail = md.slice(-1500)
-  const m = tail.match(/评级[】\]：:】]?\s*[`*_]*\**\s*(A\+|A|B|C)(?![a-zA-Z])/i)
+  const m = tail.match(/(?:评级|Rating)[】\]：:】]?\s*[`*_]*\**\s*(A\+|A|B|C)(?![a-zA-Z])/i)
   if (m) return m[1].toUpperCase()
-  const badge = tail.match(/^\s*#+\s*(?:综合评级|评级)[^\n]*?\b(A\+|A|B|C)\b/im)
+  const badge = tail.match(/^\s*#+\s*(?:综合评级|评级|Overall Rating|Rating)[^\n]*?\b(A\+|A|B|C)\b/im)
   if (badge) return badge[1].toUpperCase()
   if (tail.includes('强烈关注')) return 'A+'
   if (tail.includes('可关注')) return 'A'
@@ -42,6 +43,7 @@ export function parseRating(md: string): string | null {
  * 逐行解析 data: {...}，拼接 choices[0].delta.content，data: [DONE] 结束
  */
 export function useAiReport(): ReportState {
+  const { lang, t } = useLang()
   const [status, setStatus] = useState<ReportStatus>('idle')
   const [content, setContent] = useState('')
   const [rating, setRating] = useState<string | null>(null)
@@ -86,6 +88,8 @@ export function useAiReport(): ReportState {
                 operationYears: metrics.operationYears,
                 sensitivity: metrics.sensitivity,
               },
+              // 界面语言：后端据此生成对应语言的报告
+              lang,
             }),
             signal: controller.signal,
           })
@@ -98,9 +102,9 @@ export function useAiReport(): ReportState {
             } catch {
               /* ignore */
             }
-            throw new Error(friendlyError(res.status, serverMsg))
+            throw new Error(friendlyError(res.status, serverMsg, t))
           }
-          if (!res.body) throw new Error('AI 服务返回异常，请稍后重试')
+          if (!res.body) throw new Error(t('aitool.report.errBadResponse'))
 
           const reader = res.body.getReader()
           const decoder = new TextDecoder()
@@ -135,18 +139,18 @@ export function useAiReport(): ReportState {
             }
           }
 
-          if (!acc.trim()) throw new Error('AI 未返回有效内容，请重试')
+          if (!acc.trim()) throw new Error(t('aitool.report.errEmpty'))
           setContent(acc)
           setRating(parseRating(acc))
           setStatus('done')
         } catch (e) {
           if ((e as Error).name === 'AbortError') return
-          setError(e instanceof Error ? e.message : 'AI 服务暂时繁忙，请稍后重试')
+          setError(e instanceof Error ? e.message : t('aitool.report.errBusy'))
           setStatus('error')
         }
       })()
     },
-    [],
+    [lang, t],
   )
 
   return { status, content, rating, error, generatedAt, generate }

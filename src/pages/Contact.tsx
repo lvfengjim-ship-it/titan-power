@@ -4,8 +4,10 @@ import ContactForm from '@/components/contact/ContactForm'
 import ContactSidebar from '@/components/contact/ContactSidebar'
 import OfficeMap from '@/components/contact/OfficeMap'
 import Faq from '@/components/contact/Faq'
+import { useLang } from '@/i18n'
 
 export default function Contact() {
+  const { t } = useLang()
   return (
     <>
       {/* sonner Toaster（深色主题）— 本页表单提交反馈 */}
@@ -13,9 +15,9 @@ export default function Contact() {
 
       {/* Section 1 — PageHero */}
       <PageHero
-        breadcrumb={['首页', '联系我们']}
-        title="让我们谈谈您的项目"
-        lead="无论是项目合作、电站出售、资金合作还是加入彭田，我们承诺 48 小时内响应。"
+        breadcrumb={[t('common.nav.home'), t('common.nav.contact')]}
+        title={t('contact.hero.title')}
+        lead={t('contact.hero.lead')}
         image="/cta-band-bg.jpg"
         coord="RESPONSE WITHIN 48H"
       />

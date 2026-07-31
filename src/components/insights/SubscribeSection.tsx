@@ -1,9 +1,11 @@
 import { Clock } from 'lucide-react'
 import QRConnectCard from '@/components/QRConnectCard'
 import Reveal from '@/components/Reveal'
+import { useLang } from '@/i18n'
 
 /** 订阅与关注：公众号 / 视频号打通（青金渐变描边大卡） */
 export default function SubscribeSection() {
+  const { t } = useLang()
   return (
     <section className="mx-auto max-w-[1280px] px-6 py-24 lg:px-10">
       <Reveal y={40}>
@@ -16,15 +18,14 @@ export default function SubscribeSection() {
 
             <div className="relative max-w-xl">
               <h3 className="font-serif text-2xl font-bold leading-snug text-paper lg:text-3xl">
-                前沿解读，同步抵达你的微信
+                {t('insights.subscribe.title')}
               </h3>
               <p className="mt-4 text-base leading-7 text-mist">
-                彭田环保公众号与视频号即将开通。每日精选的前沿技术解读、AI
-                评估工具更新与行业动态，将第一时间推送。
+                {t('insights.subscribe.desc')}
               </p>
               <p className="mt-5 flex items-center gap-2 text-sm font-medium text-volt-300">
                 <Clock className="h-4 w-4 animate-pulse" />
-                账号申请中 · 敬请期待
+                {t('insights.subscribe.pending')}
               </p>
             </div>
 
@@ -32,16 +33,18 @@ export default function SubscribeSection() {
               <div className="transition-transform duration-500 hover:rotate-1 hover:scale-[1.06]">
                 <QRConnectCard
                   src="/qr-wechat-official.png"
-                  platform="公众号"
-                  title="彭田环保·公众号"
+                  platform={t('insights.subscribe.qrOfficialPlatform')}
+                  title={t('insights.subscribe.qrOfficialTitle')}
+                  status={t('insights.subscribe.qrStatus')}
                   accent="gold"
                 />
               </div>
               <div className="transition-transform duration-500 hover:-rotate-1 hover:scale-[1.06]">
                 <QRConnectCard
                   src="/qr-wechat-channel.png"
-                  platform="视频号"
-                  title="彭田环保·视频号"
+                  platform={t('insights.subscribe.qrChannelPlatform')}
+                  title={t('insights.subscribe.qrChannelTitle')}
+                  status={t('insights.subscribe.qrStatus')}
                   accent="volt"
                 />
               </div>

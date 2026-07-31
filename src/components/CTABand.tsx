@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 
 interface Props {
   title?: string
@@ -10,10 +11,13 @@ interface Props {
 
 /** 行动号召带：金青对角光晕 + 双按钮 */
 export default function CTABand({
-  title = '让每一个能源决策，都有据可依',
-  description = '免费使用 AI 投资评估工具，或与我们的投资团队预约一次项目洽谈。',
+  title,
+  description,
   className,
 }: Props) {
+  const { t } = useLang()
+  const titleText = title ?? t('common.shared.ctaTitle')
+  const descText = description ?? t('common.shared.ctaDesc')
   return (
     <section className={cn('relative overflow-hidden bg-ink-800', className)}>
       <img src="/cta-band-bg.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
@@ -24,9 +28,9 @@ export default function CTABand({
       <div className="relative mx-auto flex max-w-[1280px] flex-col items-start justify-between gap-10 px-6 py-20 lg:flex-row lg:items-center lg:px-10">
         <div className="max-w-xl">
           <h3 className="font-serif text-2xl font-bold leading-snug text-paper lg:text-3xl">
-            {title}
+            {titleText}
           </h3>
-          <p className="mt-4 text-base leading-7 text-mist">{description}</p>
+          <p className="mt-4 text-base leading-7 text-mist">{descText}</p>
         </div>
         <div className="flex flex-wrap gap-4">
           <Link
@@ -34,13 +38,13 @@ export default function CTABand({
             className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-7 py-3.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97]"
           >
             <Sparkles className="h-4 w-4" />
-            免费使用 AI 评估
+            {t('common.shared.ctaEval')}
           </Link>
           <Link
             to="/contact"
             className="rounded-xl border border-line-strong px-7 py-3.5 text-sm font-medium text-paper transition-all duration-300 hover:border-solar-400 hover:bg-solar-400/[0.08] hover:text-solar-300"
           >
-            预约项目洽谈
+            {t('common.shared.ctaBook')}
           </Link>
         </div>
       </div>

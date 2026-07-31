@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown, ExternalLink, Play, Sparkles } from 'lucide-react'
-import type { InsightVideo } from './data'
+import type { InsightVideo, TimeAgoLabels } from './data'
 import { formatDuration, timeAgo } from './data'
 import CategoryBadge from './CategoryBadge'
+import { useLang } from '@/i18n'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -14,7 +15,20 @@ interface Props {
 
 /** 视频卡：缩略图 + AI 标题 + 原标题/频道 + AI 速读 + 操作行 */
 export default function VideoCard({ video, index, onOpen }: Props) {
+  const { t } = useLang()
   const [expanded, setExpanded] = useState(false)
+
+  const timeLabels = useMemo<TimeAgoLabels>(
+    () => ({
+      tbd: t('insights.time.tbd'),
+      today: t('insights.time.today'),
+      daysAgo: (n) => t('insights.time.daysAgo').replace('{n}', String(n)),
+      weeksAgo: (n) => t('insights.time.weeksAgo').replace('{n}', String(n)),
+      monthsAgo: (n) => t('insights.time.monthsAgo').replace('{n}', String(n)),
+      yearsAgo: (n) => t('insights.time.yearsAgo').replace('{n}', String(n)),
+    }),
+    [t],
+  )
 
   return (
     <motion.article
@@ -68,7 +82,7 @@ export default function VideoCard({ video, index, onOpen }: Props) {
           {video.title}
         </p>
         <p className="mt-1 text-xs text-dim">
-          {video.channelTitle || 'YouTube 频道'} · {timeAgo(video.publishedAt)}
+          {video.channelTitle || t('insights.grid.channelFallback')} · {timeAgo(video.publishedAt, timeLabels)}
         </p>
 
         {/* AI 速读 */}
@@ -76,7 +90,7 @@ export default function VideoCard({ video, index, onOpen }: Props) {
           <div className="mt-4 rounded-xl bg-ink-850 p-3.5">
             <p className="flex items-center gap-1.5 text-xs font-medium text-volt-400">
               <Sparkles className="h-3.5 w-3.5" />
-              AI 速读
+              {t('insights.card.aiSummaryLabel')}
             </p>
             <p
               className={cn(
@@ -90,7 +104,7 @@ export default function VideoCard({ video, index, onOpen }: Props) {
               onClick={() => setExpanded((v) => !v)}
               className="mt-1.5 flex items-center gap-1 text-xs font-medium text-volt-400 transition-colors hover:text-volt-300"
             >
-              {expanded ? '收起' : '展开'}
+              {expanded ? t('insights.card.collapse') : t('insights.card.expand')}
               <ChevronDown
                 className={cn('h-3.5 w-3.5 transition-transform duration-300', expanded && 'rotate-180')}
               />
@@ -105,7 +119,7 @@ export default function VideoCard({ video, index, onOpen }: Props) {
             className="flex items-center gap-2 rounded-xl border border-volt-400/40 bg-volt-400/10 px-4 py-2 text-sm font-medium text-volt-300 transition-all duration-300 hover:bg-volt-400/20 hover:text-volt-300 hover:shadow-[0_0_20px_-6px_rgba(44,224,190,0.5)]"
           >
             <Play className="h-3.5 w-3.5" />
-            观看解读
+            {t('insights.card.watch')}
           </button>
           <a
             href={video.videoUrl || `https://www.youtube.com/watch?v=${video.youtubeId}`}
@@ -114,7 +128,7 @@ export default function VideoCard({ video, index, onOpen }: Props) {
             className="flex items-center gap-1.5 text-sm text-dim transition-colors hover:text-mist"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            原视频
+            {t('insights.card.original')}
           </a>
         </div>
       </div>

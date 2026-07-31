@@ -3,21 +3,47 @@ import { Link, NavLink, useLocation } from 'react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Menu, X, MessageSquare, PlaySquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLang, type Lang } from '@/i18n'
 
 export const NAV_LINKS = [
-  { to: '/', label: '首页' },
-  { to: '/about', label: '关于我们' },
-  { to: '/business', label: '业务领域' },
-  { to: '/insights', label: '前沿洞察' },
-  { to: '/contact', label: '联系我们' },
-]
+  { to: '/', labelKey: 'common.nav.home' },
+  { to: '/about', labelKey: 'common.nav.about' },
+  { to: '/business', labelKey: 'common.nav.business' },
+  { to: '/insights', labelKey: 'common.nav.insights' },
+  { to: '/contact', labelKey: 'common.nav.contact' },
+] as const
 
 export const NAV_HEIGHT = 64 // px — h-16; Layout owns this offset
+
+function LangSwitch({ className }: { className?: string }) {
+  const { lang, setLang, t } = useLang()
+  const btn = (target: Lang, label: string) => (
+    <button
+      key={target}
+      onClick={() => setLang(target)}
+      aria-pressed={lang === target}
+      className={cn(
+        'px-1 font-medium tracking-wide transition-colors',
+        lang === target ? 'text-solar-400' : 'text-mist hover:text-paper',
+      )}
+    >
+      {label}
+    </button>
+  )
+  return (
+    <div className={cn('flex items-center gap-1.5 text-xs', className)}>
+      {btn('zh', t('common.lang.zh'))}
+      <span className="text-dim">|</span>
+      {btn('en', t('common.lang.en'))}
+    </div>
+  )
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const location = useLocation()
+  const { t } = useLang()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -42,11 +68,11 @@ export default function Navbar() {
       <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-10">
         {/* brand */}
         <Link to="/" className="group flex items-center gap-3">
-          <img src="/logo.svg" alt="彭田环保" className="h-5 w-auto" />
+          <img src="/logo.svg" alt={t('common.brand.name')} className="h-5 w-auto" />
           <span className="flex flex-col leading-none">
-            <span className="font-serif text-lg font-bold text-paper">彭田环保</span>
+            <span className="font-serif text-lg font-bold text-paper">{t('common.brand.name')}</span>
             <span className="mt-1 font-display text-[10px] font-medium tracking-[0.3em] text-dim">
-              PT MOMENTUM
+              {t('common.brand.sub')}
             </span>
           </span>
         </Link>
@@ -67,7 +93,7 @@ export default function Navbar() {
             >
               {({ isActive }) => (
                 <>
-                  {item.label}
+                  {t(item.labelKey)}
                   <span
                     className={cn(
                       'absolute -bottom-0.5 left-0 h-0.5 bg-solar-400 transition-all duration-300',
@@ -78,6 +104,7 @@ export default function Navbar() {
               )}
             </NavLink>
           ))}
+          <LangSwitch className="ml-2" />
         </nav>
 
         <div className="flex items-center gap-4">
@@ -89,7 +116,7 @@ export default function Navbar() {
             className="hidden items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-5 py-2.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97] sm:flex"
           >
             <Sparkles className="h-4 w-4" />
-            AI 投资评估
+            {t('common.cta.aiTool')}
           </Link>
           <button
             className="text-paper lg:hidden"
@@ -119,7 +146,7 @@ export default function Navbar() {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-center justify-between">
-                <img src="/logo.svg" alt="彭田环保" className="h-5 w-auto" />
+                <img src="/logo.svg" alt={t('common.brand.name')} className="h-5 w-auto" />
                 <button onClick={() => setOpen(false)} aria-label="关闭菜单" className="text-mist">
                   <X className="h-6 w-6" />
                 </button>
@@ -142,25 +169,26 @@ export default function Navbar() {
                         )
                       }
                     >
-                      {item.label}
+                      {t(item.labelKey)}
                     </NavLink>
                   </motion.div>
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-5">
+                <LangSwitch className="text-sm" />
                 <Link
                   to="/ai-tool"
                   className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-5 py-3 text-sm font-bold text-abyss"
                 >
                   <Sparkles className="h-4 w-4" />
-                  AI 投资评估
+                  {t('common.cta.aiTool')}
                 </Link>
                 <div className="flex items-center gap-6 text-dim">
                   <span className="flex items-center gap-2 text-sm">
-                    <MessageSquare className="h-4 w-4" /> 公众号 · 申请中
+                    <MessageSquare className="h-4 w-4" /> {t('common.mobile.official')}
                   </span>
                   <span className="flex items-center gap-2 text-sm">
-                    <PlaySquare className="h-4 w-4" /> 视频号 · 申请中
+                    <PlaySquare className="h-4 w-4" /> {t('common.mobile.channel')}
                   </span>
                 </div>
               </div>

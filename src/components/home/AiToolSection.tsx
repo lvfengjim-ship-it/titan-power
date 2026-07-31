@@ -3,12 +3,12 @@ import { Link } from 'react-router'
 import { Check, Sparkles } from 'lucide-react'
 import Reveal from '@/components/Reveal'
 import TagBadge from '@/components/TagBadge'
-
-const FEATURES = ['财务模型实时测算', 'AI 深度解读', '敏感性分析', '完全免费 · 无需注册']
-const TYPE_TEXT = '本项目资本金内部收益率优于行业基准，建议关注电价政策与消纳风险…'
+import { useLang } from '@/i18n'
 
 /** 微缩仪表盘 mock（纯 UI，非图片） */
 function DashboardMock() {
+  const { t } = useLang()
+  const typeText = t('home.aiTool.mock.typeText')
   const wrap = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ rx: 4, ry: -8 })
   const [irr, setIrr] = useState(12.8)
@@ -76,19 +76,19 @@ function DashboardMock() {
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
-      setTyped(TYPE_TEXT)
+      setTyped(typeText)
       return
     }
     let i = 0
     let timer: ReturnType<typeof setTimeout>
     const tick = () => {
-      i = (i + 1) % (TYPE_TEXT.length + 60)
-      setTyped(TYPE_TEXT.slice(0, Math.min(i, TYPE_TEXT.length)))
-      timer = setTimeout(tick, i > TYPE_TEXT.length ? 80 : 40)
+      i = (i + 1) % (typeText.length + 60)
+      setTyped(typeText.slice(0, Math.min(i, typeText.length)))
+      timer = setTimeout(tick, i > typeText.length ? 80 : 40)
     }
     timer = setTimeout(tick, 800)
     return () => clearTimeout(timer)
-  }, [])
+  }, [typeText])
 
   return (
     <div ref={wrap} style={{ perspective: '1200px' }}>
@@ -110,8 +110,8 @@ function DashboardMock() {
         {/* sliders */}
         <div className="mt-5 space-y-4">
           {[
-            { label: '装机容量', val: '120 MW', w: '72%' },
-            { label: '利用小时', val: '1350 h', w: '58%' },
+            { label: t('home.aiTool.mock.capacity'), val: '120 MW', w: '72%' },
+            { label: t('home.aiTool.mock.hours'), val: '1350 h', w: '58%' },
           ].map((s) => (
             <div key={s.label}>
               <div className="flex justify-between text-xs">
@@ -128,17 +128,18 @@ function DashboardMock() {
         {/* IRR */}
         <div className="mt-6 flex items-end justify-between border-t border-line pt-5">
           <div>
-            <p className="font-mono text-xs text-dim">资本金 IRR</p>
+            <p className="font-mono text-xs text-dim">{t('home.aiTool.mock.equityIrr')}</p>
             <p className="mt-1 font-display text-4xl font-bold text-solar-400 tabular-nums">
               {irr.toFixed(1)}%
             </p>
           </div>
           <div className="text-right text-xs text-mist">
             <p>
-              LCOE <span className="font-mono text-paper">0.241 元/kWh</span>
+              LCOE <span className="font-mono text-paper">{t('home.aiTool.mock.lcoeValue')}</span>
             </p>
             <p className="mt-1">
-              回收期 <span className="font-mono text-paper">8.6 年</span>
+              {t('home.aiTool.mock.payback')}{' '}
+              <span className="font-mono text-paper">{t('home.aiTool.mock.paybackValue')}</span>
             </p>
           </div>
         </div>
@@ -168,7 +169,7 @@ function DashboardMock() {
         {/* AI 解读 typewriter */}
         <div className="mt-4 rounded-xl border border-volt-400/20 bg-volt-400/5 p-3">
           <p className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.15em] text-volt-400">
-            <Sparkles className="h-3 w-3" /> AI 解读
+            <Sparkles className="h-3 w-3" /> {t('home.aiTool.mock.aiInsight')}
           </p>
           <p className="mt-1.5 min-h-[1.25rem] text-xs leading-5 text-mist">
             {typed}
@@ -181,6 +182,13 @@ function DashboardMock() {
 }
 
 export default function AiToolSection() {
+  const { t } = useLang()
+  const features = [
+    t('home.aiTool.features.model'),
+    t('home.aiTool.features.ai'),
+    t('home.aiTool.features.sensitivity'),
+    t('home.aiTool.features.free'),
+  ]
   return (
     <section className="mx-auto max-w-[1280px] px-6 py-32 lg:px-10">
       <Reveal>
@@ -198,16 +206,15 @@ export default function AiToolSection() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             {/* copy */}
             <div>
-              <TagBadge tone="volt">AI 驱动 · 免费开放</TagBadge>
+              <TagBadge tone="volt">{t('home.aiTool.badge')}</TagBadge>
               <h3 className="mt-5 font-serif text-2xl font-bold leading-snug text-paper lg:text-3xl">
-                10 分钟，算清一座电站的投资账
+                {t('home.aiTool.title')}
               </h3>
               <p className="mt-4 max-w-lg text-base leading-8 text-mist">
-                输入装机容量、利用小时、电价、造价与融资参数，即刻获得 IRR、LCOE、投资回收期等专业指标，并由
-                AI 大模型生成专属投资解读报告。
+                {t('home.aiTool.description')}
               </p>
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-                {FEATURES.map((f) => (
+                {features.map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-paper">
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-volt-400/15 text-volt-400">
                       <Check className="h-3 w-3" />
@@ -221,7 +228,7 @@ export default function AiToolSection() {
                 className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-7 py-3.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97]"
               >
                 <Sparkles className="h-4 w-4" />
-                立即开始评估
+                {t('home.aiTool.cta')}
               </Link>
             </div>
             {/* product mock */}

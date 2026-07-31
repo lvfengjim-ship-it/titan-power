@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { ArrowUp } from 'lucide-react'
+import { useLang } from '@/i18n'
 import { useState } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
@@ -16,6 +17,7 @@ import Footer from './Footer'
  * Full-bleed hero sections opt out inside the page (e.g. `-mt-16`).
  */
 export default function Layout() {
+  const { t } = useLang()
   const location = useLocation()
   const lenisRef = useRef<Lenis | null>(null)
   const { scrollYProgress } = useScroll()
@@ -71,7 +73,7 @@ export default function Layout() {
 
       {/* back to top */}
       <button
-        aria-label="回到顶部"
+        aria-label={t('common.shared.backTop')}
         onClick={() => {
           if (lenisRef.current) lenisRef.current.scrollTo(0)
           else window.scrollTo({ top: 0, behavior: 'smooth' })

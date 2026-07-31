@@ -4,6 +4,7 @@ import SectionHeading from '@/components/SectionHeading'
 import TagBadge from '@/components/TagBadge'
 import Reveal from '@/components/Reveal'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 
 interface VideoItem {
   id: string
@@ -70,9 +71,40 @@ const MOCK_VIDEOS: VideoItem[] = [
   },
 ]
 
+/** 英文版 mock 兜底数据（API 不可用时展示） */
+const MOCK_VIDEOS_EN_OVERRIDE: Record<string, Pick<VideoItem, 'title' | 'aiSummary'>> = {
+  v1: {
+    title: 'How Small Modular Reactors (SMRs) Are Changing the Economics of Nuclear Power',
+    aiSummary:
+      'SMRs sharply compress construction timelines and capex through factory prefabrication and modular deployment. The video breaks down the latest progress from NuScale and Rolls-Royce SMR, and analyzes their potential impact on distributed grids.',
+  },
+  v2: {
+    title: 'Behind the 60% Drop in Green Hydrogen Electrolyzer Costs: A Full Map of Technology Routes',
+    aiSummary:
+      'PEM, alkaline, and SOEC electrolyzer routes are racing ahead, with scale effects and catalyst cost reduction as the main drivers. The video compares the cost curves of European and Chinese manufacturers—green hydrogen parity may arrive earlier than expected.',
+  },
+  v3: {
+    title: 'Flow Batteries vs Solid-State Batteries: The Next Decade of Long-Duration Storage',
+    aiSummary:
+      'Demand for 4+ hour long-duration storage is surging. Flow batteries lead on safety and cycle life, while solid-state batteries are breaking through on energy density. The video assesses the investment window for both routes.',
+  },
+  v4: {
+    title: 'Perovskite Tandem Cells Break 34% Efficiency: How Far from Mass Production?',
+    aiSummary:
+      'Perovskite/silicon tandem lab efficiencies keep setting records, but stability and large-area uniformity remain mass-production bottlenecks. The video reviews pilot-line progress at Oxford PV and GCL Optoelectronics.',
+  },
+}
+
 export default function InsightsSection() {
+  const { lang, t } = useLang()
   const [videos, setVideos] = useState<VideoItem[] | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
+
+  const categoryLabel = (c: VideoItem['category']) => {
+    const key = `home.insights.categories.${c}`
+    const label = t(key)
+    return label === key ? c : label
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -99,17 +131,17 @@ export default function InsightsSection() {
           <SectionHeading
             eyebrow="Global Insights"
             eyebrowColor="volt"
-            title="全球能源前沿，每日由 AI 为你解读"
-            description="我们的系统每日自动抓取海外核能、氢能、储能等领域的前沿技术视频，并由 AI 生成中文解读，免费开放给每一位行业同仁。"
+            title={t('home.insights.title')}
+            description={t('home.insights.description')}
             linkTo="/insights"
-            linkLabel="进入前沿洞察"
+            linkLabel={t('home.insights.linkLabel')}
           />
         </Reveal>
 
         <Reveal delay={100}>
           <p className="mt-8 flex items-center gap-2 text-xs text-dim">
             <Globe className="h-3.5 w-3.5" />
-            内容每日 08:00 自动更新 · 来源：国内公开媒体以及 Youtube 公开渠道 · AI 中文解读
+            {t('home.insights.note')}
           </p>
         </Reveal>
 
@@ -126,7 +158,11 @@ export default function InsightsSection() {
               </div>
             ))}
 
-          {videos?.map((v, i) => (
+          {videos
+            ?.map((v) =>
+              lang === 'en' ? { ...v, ...(MOCK_VIDEOS_EN_OVERRIDE[v.id] ?? {}) } : v,
+            )
+            .map((v, i) => (
             <Reveal key={v.id} delay={i * 100} y={32}>
               <article className="group overflow-hidden rounded-2xl border border-line bg-ink-800 transition-all duration-500 hover:-translate-y-1.5 hover:border-line-strong">
                 <div className="relative aspect-video overflow-hidden">
@@ -152,7 +188,7 @@ export default function InsightsSection() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <TagBadge tone={CATEGORY_TONE[v.category]}>{v.category}</TagBadge>
+                  <TagBadge tone={CATEGORY_TONE[v.category]}>{categoryLabel(v.category)}</TagBadge>
                   <h3 className="mt-3 line-clamp-2 font-sans text-sm font-bold leading-snug text-paper">
                     {v.title}
                   </h3>
@@ -164,7 +200,7 @@ export default function InsightsSection() {
                     className="mt-3 flex items-center gap-1.5 text-xs font-medium text-volt-400 transition-colors hover:text-volt-300"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
-                    AI 解读
+                    {t('home.insights.aiInsight')}
                     <ChevronDown
                       className={cn('h-3.5 w-3.5 transition-transform duration-300', openId === v.id && 'rotate-180')}
                     />

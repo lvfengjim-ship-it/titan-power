@@ -1,5 +1,6 @@
 import TagBadge from '@/components/TagBadge'
 import { CATEGORY_LABEL, CATEGORY_TONE } from './data'
+import { useLang } from '@/i18n'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -9,8 +10,11 @@ interface Props {
 
 /** 分类徽章：复用 TagBadge 配色，other/未知分类用 paper 色 */
 export default function CategoryBadge({ category, className }: Props) {
+  const { t } = useLang()
   const tone = CATEGORY_TONE[category] ?? 'paper'
-  const label = CATEGORY_LABEL[category] ?? '综合能源'
+  const label = CATEGORY_LABEL[category]
+    ? t(`insights.filter.categories.${category}`)
+    : t('insights.filter.categories.other')
   if (tone === 'paper') {
     return (
       <TagBadge tone="volt" className={cn('border-paper/40 bg-paper/10 text-paper', className)}>

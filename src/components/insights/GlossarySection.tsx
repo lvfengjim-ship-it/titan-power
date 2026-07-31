@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import SectionHeading from '@/components/SectionHeading'
 import Reveal from '@/components/Reveal'
 import { GLOSSARY } from './data'
+import { useLang } from '@/i18n'
 
 interface Props {
   onFilter: (keyword: string) => void
@@ -9,15 +10,16 @@ interface Props {
 
 /** 行业普及专栏「术语库」：横向滚动卡带 */
 export default function GlossarySection({ onFilter }: Props) {
+  const { t } = useLang()
   return (
     <section className="bg-ink-900 py-32">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <Reveal>
           <SectionHeading
-            eyebrow="Glossary"
+            eyebrow={t('insights.glossary.eyebrow')}
             eyebrowColor="volt"
-            title="三分钟看懂前沿术语"
-            description="配合视频内容，我们整理了高频前沿术语的通俗解释。"
+            title={t('insights.glossary.title')}
+            description={t('insights.glossary.desc')}
           />
         </Reveal>
       </div>
@@ -54,7 +56,7 @@ export default function GlossarySection({ onFilter }: Props) {
                   className="mt-auto flex items-center gap-1.5 pt-4 text-left text-xs font-medium transition-colors"
                   style={{ color: term.color }}
                 >
-                  相关视频 3 部
+                  {t('insights.glossary.related')}
                   <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>

@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 import { MIN_CAPACITY_MW } from './finance'
 import type { ProjectParams, ProjectType } from './finance'
 
@@ -115,18 +116,16 @@ function SwitchRow({ label, hint, checked, onChange }: SwitchRowProps) {
 
 /* ---------- 项目类型分段控件 ---------- */
 
-const TYPE_TABS: { key: ProjectType; label: string; icon: ReactNode; active: string }[] = [
-  { key: 'pv', label: '光伏', icon: <Sun className="h-4 w-4" />, active: 'text-solar-300' },
-  { key: 'wind', label: '风电', icon: <Wind className="h-4 w-4" />, active: 'text-volt-300' },
+const TYPE_TABS: { key: ProjectType; icon: ReactNode; active: string }[] = [
+  { key: 'pv', icon: <Sun className="h-4 w-4" />, active: 'text-solar-300' },
+  { key: 'wind', icon: <Wind className="h-4 w-4" />, active: 'text-volt-300' },
   {
     key: 'storage',
-    label: '储能',
     icon: <BatteryCharging className="h-4 w-4" />,
     active: 'text-[#7A8CFF]',
   },
   {
     key: 'pvStorage',
-    label: '光+储',
     icon: (
       <span className="flex items-center">
         <Sun className="h-3.5 w-3.5" />
@@ -144,6 +143,7 @@ function TypeTabs({
   value: ProjectType
   onChange: (t: ProjectType) => void
 }) {
+  const { t } = useLang()
   return (
     <div className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-ink-850 p-1 sm:grid-cols-4">
       {TYPE_TABS.map((tab) => {
@@ -166,7 +166,7 @@ function TypeTabs({
             )}
             <span className="relative flex items-center gap-1.5">
               {tab.icon}
-              {tab.label}
+              {t(`aitool.types.tab.${tab.key}`)}
             </span>
           </button>
         )
@@ -186,6 +186,7 @@ interface Props {
 }
 
 export default function ParamsPanel({ type, params, onTypeChange, onParamsChange, onReset }: Props) {
+  const { t } = useLang()
   const set = <K extends keyof ProjectParams>(key: K, v: ProjectParams[K]) =>
     onParamsChange({ ...params, [key]: v })
 
@@ -209,7 +210,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
       <div>
         <p className="mb-3 flex items-center gap-2 font-mono text-xs tracking-[0.15em] text-dim">
           <span className="flex h-5 w-5 items-center justify-center rounded-full border border-volt-400/40 text-[10px] text-volt-400">1</span>
-          项目类型 / PROJECT TYPE
+          {t('aitool.params.step1')}
         </p>
         <TypeTabs value={type} onChange={onTypeChange} />
       </div>
@@ -218,7 +219,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
       <div>
         <p className="mb-3 flex items-center gap-2 font-mono text-xs tracking-[0.15em] text-dim">
           <span className="flex h-5 w-5 items-center justify-center rounded-full border border-volt-400/40 text-[10px] text-volt-400">2</span>
-          参数设置 / PARAMETERS
+          {t('aitool.params.step2')}
         </p>
 
         <Accordion
@@ -231,12 +232,18 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             <AccordionTrigger className="py-3.5 text-sm font-bold text-paper hover:no-underline [&[data-state=open]>svg]:text-volt-400">
               <span className="flex items-center gap-2.5">
                 <Factory className="h-4 w-4 text-volt-400" />
-                建设规模
+                {t('aitool.params.secCapacity')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <SliderRow
-                label={isStorage ? '装机功率' : isPvStorage ? '光伏装机容量' : '装机容量'}
+                label={
+                  isStorage
+                    ? t('aitool.params.capacityPower')
+                    : isPvStorage
+                      ? t('aitool.params.pvCapacity')
+                      : t('aitool.params.capacity')
+                }
                 value={params.capacityMW}
                 min={capMin}
                 max={500}
@@ -247,7 +254,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               />
               {isStorage && (
                 <SliderRow
-                  label="储能时长"
+                  label={t('aitool.params.storageHours')}
                   value={params.storageHours}
                   min={1}
                   max={4}
@@ -259,13 +266,14 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               )}
               {isStorage && (
                 <p className="font-mono text-[11px] text-dim">
-                  能量容量 = {params.capacityMW} MW × {params.storageHours} h ={' '}
-                  {(params.capacityMW * params.storageHours).toFixed(0)} MWh
+                  {t('aitool.params.energyCapacity')} = {params.capacityMW} MW ×{' '}
+                  {params.storageHours} h = {(params.capacityMW * params.storageHours).toFixed(0)}{' '}
+                  MWh
                 </p>
               )}
               {isPvStorage && (
                 <SliderRow
-                  label="储能功率"
+                  label={t('aitool.params.storagePower')}
                   value={params.storagePowerMW}
                   min={0.5}
                   max={100}
@@ -277,7 +285,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               )}
               {isPvStorage && (
                 <SliderRow
-                  label="储能容量"
+                  label={t('aitool.params.storageEnergy')}
                   value={params.storageEnergyMWh}
                   min={1}
                   max={200}
@@ -289,12 +297,16 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               )}
               {isPvStorage && (
                 <p className="font-mono text-[11px] text-dim">
-                  光储配置 = 光伏 {params.capacityMW} MW + 储能 {params.storagePowerMW} MW ·{' '}
-                  {params.storageEnergyMWh} MWh（
-                  {params.storagePowerMW > 0
-                    ? (params.storageEnergyMWh / params.storagePowerMW).toFixed(1)
-                    : '—'}
-                  h）
+                  {t('aitool.params.pvStorageConfig')
+                    .replace('{pv}', String(params.capacityMW))
+                    .replace('{p}', String(params.storagePowerMW))
+                    .replace('{e}', String(params.storageEnergyMWh))
+                    .replace(
+                      '{h}',
+                      params.storagePowerMW > 0
+                        ? (params.storageEnergyMWh / params.storagePowerMW).toFixed(1)
+                        : '—',
+                    )}
                 </p>
               )}
             </AccordionContent>
@@ -305,21 +317,33 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             <AccordionTrigger className="py-3.5 text-sm font-bold text-paper hover:no-underline [&[data-state=open]>svg]:text-volt-400">
               <span className="flex items-center gap-2.5">
                 <Zap className="h-4 w-4 text-volt-400" />
-                资源与发电
+                {t('aitool.params.secResource')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <SliderRow
-                label={isStorage ? '等效满充放次数' : isPvStorage ? '光伏首年利用小时' : '首年利用小时'}
+                label={
+                  isStorage
+                    ? t('aitool.params.equivCycles')
+                    : isPvStorage
+                      ? t('aitool.params.pvFirstYearHours')
+                      : t('aitool.params.firstYearHours')
+                }
                 value={params.utilizationHours}
                 min={isStorage ? 100 : 800}
                 max={isStorage ? 500 : 2600}
                 step={isStorage ? 5 : 10}
-                unit={isStorage ? '次/年' : 'h'}
+                unit={isStorage ? t('aitool.units.cyclesPerYear') : 'h'}
                 onChange={(v) => set('utilizationHours', v)}
               />
               <SliderRow
-                label={isStorage ? '容量年衰减率' : isPvStorage ? '光伏年衰减率' : '年衰减率'}
+                label={
+                  isStorage
+                    ? t('aitool.params.capacityDegradation')
+                    : isPvStorage
+                      ? t('aitool.params.pvDegradation')
+                      : t('aitool.params.degradation')
+                }
                 value={params.degradation}
                 min={0}
                 max={isStorage ? 3 : 1.5}
@@ -330,7 +354,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               />
               {!isWind && (
                 <SliderRow
-                  label={isStorage ? '充放电效率' : '系统效率 PR'}
+                  label={isStorage ? t('aitool.params.chargeEfficiency') : t('aitool.params.systemPR')}
                   value={params.efficiency}
                   min={75}
                   max={95}
@@ -342,18 +366,18 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               )}
               {isPvStorage && (
                 <SliderRow
-                  label="储能年循环次数"
+                  label={t('aitool.params.storageCycles')}
                   value={params.storageCycles}
                   min={100}
                   max={500}
                   step={5}
-                  unit="次/年"
+                  unit={t('aitool.units.cyclesPerYear')}
                   onChange={(v) => set('storageCycles', v)}
                 />
               )}
               {isPvStorage && (
                 <SliderRow
-                  label="储能充放效率"
+                  label={t('aitool.params.storageEfficiency')}
                   value={params.storageEfficiency}
                   min={75}
                   max={95}
@@ -371,46 +395,46 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             <AccordionTrigger className="py-3.5 text-sm font-bold text-paper hover:no-underline [&[data-state=open]>svg]:text-volt-400">
               <span className="flex items-center gap-2.5">
                 <Coins className="h-4 w-4 text-volt-400" />
-                电价与收入
+                {t('aitool.params.secTariff')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               {isWind && (
                 <NumberRow
-                  label="上网电价"
+                  label={t('aitool.params.feedInTariff')}
                   value={params.tariff}
                   min={0.15}
                   max={0.65}
                   step={0.005}
                   digits={3}
-                  unit="元/kWh"
+                  unit={t('aitool.units.yuanKwh')}
                   onChange={(v) => set('tariff', v)}
                 />
               )}
               {hasPvPart && (
                 <>
                   <NumberRow
-                    label="客户自用电价"
+                    label={t('aitool.params.selfUseTariff')}
                     value={params.selfUseTariff}
                     min={0.3}
                     max={1.5}
                     step={0.01}
                     digits={2}
-                    unit="元/kWh"
+                    unit={t('aitool.units.yuanKwh')}
                     onChange={(v) => set('selfUseTariff', v)}
                   />
                   <NumberRow
-                    label="上网电价（余电）"
+                    label={t('aitool.params.surplusTariff')}
                     value={params.tariff}
                     min={0.15}
                     max={0.65}
                     step={0.005}
                     digits={3}
-                    unit="元/kWh"
+                    unit={t('aitool.units.yuanKwh')}
                     onChange={(v) => set('tariff', v)}
                   />
                   <SliderRow
-                    label="自用比例"
+                    label={t('aitool.params.selfUseRatio')}
                     value={params.selfUseRatio}
                     min={0}
                     max={100}
@@ -419,17 +443,17 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                     onChange={(v) => set('selfUseRatio', v)}
                   />
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-mist">上网比例</span>
+                    <span className="text-sm text-mist">{t('aitool.params.gridRatio')}</span>
                     <ValueText>
                       {(100 - params.selfUseRatio).toFixed(0)}
-                      <span className="ml-1 text-[11px] text-dim">%（= 100% − 自用比例，余电上网）</span>
+                      <span className="ml-1 text-[11px] text-dim">{t('aitool.params.gridRatioNote')}</span>
                     </ValueText>
                   </div>
                 </>
               )}
               {!isStorage && (
                 <SliderRow
-                  label="电价年增长率"
+                  label={t('aitool.params.tariffGrowth')}
                   value={params.tariffGrowth}
                   min={-2}
                   max={3}
@@ -441,36 +465,36 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
               )}
               {isPvStorage && (
                 <NumberRow
-                  label="峰谷价差"
+                  label={t('aitool.params.peakValleySpread')}
                   value={params.peakValleySpread}
                   min={0.1}
                   max={1.5}
                   step={0.01}
                   digits={2}
-                  unit="元/kWh"
+                  unit={t('aitool.units.yuanKwh')}
                   onChange={(v) => set('peakValleySpread', v)}
                 />
               )}
               {isStorage && (
                 <>
                   <NumberRow
-                    label="容量租赁收入"
+                    label={t('aitool.params.capacityLease')}
                     value={params.capacityLease}
                     min={0}
                     max={400}
                     step={5}
                     digits={0}
-                    unit="元/kW·年"
+                    unit={t('aitool.units.yuanKwYear')}
                     onChange={(v) => set('capacityLease', v)}
                   />
                   <NumberRow
-                    label="辅助服务/现货套利价差"
+                    label={t('aitool.params.arbitrageSpread')}
                     value={params.arbitrageSpread}
                     min={0.1}
                     max={1}
                     step={0.01}
                     digits={2}
-                    unit="元/kWh"
+                    unit={t('aitool.units.yuanKwh')}
                     onChange={(v) => set('arbitrageSpread', v)}
                   />
                 </>
@@ -483,50 +507,50 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             <AccordionTrigger className="py-3.5 text-sm font-bold text-paper hover:no-underline [&[data-state=open]>svg]:text-volt-400">
               <span className="flex items-center gap-2.5">
                 <Wallet className="h-4 w-4 text-volt-400" />
-                成本与投资
+                {t('aitool.params.secCost')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <NumberRow
-                label={isPvStorage ? '光伏单位造价' : '单位造价'}
+                label={isPvStorage ? t('aitool.params.pvUnitCapex') : t('aitool.params.unitCapex')}
                 value={params.unitCapex}
                 min={isStorage ? 0.5 : 2}
                 max={isStorage ? 2.5 : 10}
                 step={0.05}
                 digits={2}
-                unit={isStorage ? '元/Wh' : '元/W'}
+                unit={isStorage ? t('aitool.units.yuanWh') : t('aitool.units.yuanW')}
                 onChange={(v) => set('unitCapex', v)}
               />
               {isPvStorage && (
                 <NumberRow
-                  label="储能单位造价"
+                  label={t('aitool.params.storageUnitCapex')}
                   value={params.storageUnitCapex}
                   min={0.5}
                   max={2.5}
                   step={0.05}
                   digits={2}
-                  unit="元/Wh"
+                  unit={t('aitool.units.yuanWh')}
                   onChange={(v) => set('storageUnitCapex', v)}
                 />
               )}
               <NumberRow
-                label="年运维成本"
+                label={t('aitool.params.omCost')}
                 value={params.omCost}
                 min={0}
                 max={0.2}
                 step={0.005}
                 digits={3}
-                unit={isStorage ? '元/Wh·年' : '元/W·年'}
+                unit={isStorage ? t('aitool.units.yuanWhYear') : t('aitool.units.yuanWYear')}
                 onChange={(v) => set('omCost', v)}
               />
               <NumberRow
-                label="土地/租金"
+                label={t('aitool.params.landRent')}
                 value={params.landRent}
                 min={0}
                 max={500}
                 step={5}
                 digits={0}
-                unit="万元/年"
+                unit={t('aitool.units.wanPerYear')}
                 onChange={(v) => set('landRent', v)}
               />
             </AccordionContent>
@@ -537,12 +561,12 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
             <AccordionTrigger className="py-3.5 text-sm font-bold text-paper hover:no-underline [&[data-state=open]>svg]:text-volt-400">
               <span className="flex items-center gap-2.5">
                 <Landmark className="h-4 w-4 text-volt-400" />
-                融资与税费
+                {t('aitool.params.secFinance')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5 pt-1">
               <SliderRow
-                label="资本金比例"
+                label={t('aitool.params.equityRatio')}
                 value={params.equityRatio}
                 min={20}
                 max={100}
@@ -551,7 +575,7 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                 onChange={(v) => set('equityRatio', v)}
               />
               <SliderRow
-                label="贷款利率"
+                label={t('aitool.params.loanRate')}
                 value={params.loanRate}
                 min={2.5}
                 max={6}
@@ -561,25 +585,25 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                 onChange={(v) => set('loanRate', v)}
               />
               <SliderRow
-                label="贷款期限"
+                label={t('aitool.params.loanTerm')}
                 value={params.loanTerm}
                 min={5}
                 max={20}
                 step={1}
-                unit="年"
+                unit={t('aitool.units.year')}
                 onChange={(v) => set('loanTerm', v)}
               />
               <SliderRow
-                label="运营期"
+                label={t('aitool.params.operationYears')}
                 value={params.operationYears}
                 min={15}
                 max={30}
                 step={1}
-                unit="年"
+                unit={t('aitool.units.year')}
                 onChange={(v) => set('operationYears', v)}
               />
               <SliderRow
-                label="残值率"
+                label={t('aitool.params.salvageRate')}
                 value={params.salvageRate}
                 min={0}
                 max={10}
@@ -589,15 +613,15 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
                 onChange={(v) => set('salvageRate', v)}
               />
               <SwitchRow
-                label="所得税三免三减半"
-                hint="前 3 年免征 · 4–6 年减半"
+                label={t('aitool.params.taxHoliday')}
+                hint={t('aitool.params.taxHolidayHint')}
                 checked={params.taxHoliday}
                 onChange={(v) => set('taxHoliday', v)}
               />
               {!isStorage && (
                 <SwitchRow
-                  label="增值税即征即退 50%"
-                  hint="计入其他收益"
+                  label={t('aitool.params.vatRefund')}
+                  hint={t('aitool.params.vatRefundHint')}
                   checked={params.vatRefund}
                   onChange={(v) => set('vatRefund', v)}
                 />
@@ -614,10 +638,10 @@ export default function ParamsPanel({ type, params, onTypeChange, onParamsChange
           className="group inline-flex items-center gap-2 self-start text-sm text-mist transition-colors hover:text-solar-300"
         >
           <RotateCcw className="h-4 w-4 transition-transform duration-500 group-hover:-rotate-180" />
-          重置为典型参数
+          {t('aitool.params.reset')}
         </button>
         <p className="font-mono text-[11px] tracking-[0.08em] text-dim">
-          MODEL v1.0 · 测算口径见页面底部说明与免责声明
+          {t('aitool.params.modelNote')}
         </p>
       </div>
     </motion.div>

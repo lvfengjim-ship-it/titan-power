@@ -18,6 +18,7 @@ import {
   Cell,
 } from 'recharts'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 import type { FinancialMetrics } from './finance'
 import { fmtEnergy, fmtMoneyWan, fmtNumber, fmtPct, fmtYears } from './finance'
 
@@ -93,15 +94,19 @@ const tooltipStyle = {
   color: '#EDF2F9',
 }
 
-const fmtWanAxis = (v: number) =>
-  Math.abs(v) >= 10000 ? `${(v / 10000).toFixed(1)}亿` : `${Math.round(v)}万`
+const fmtWanAxis = (v: number, en: boolean) => {
+  if (en) {
+    return Math.abs(v) >= 10000 ? `${(v / 100000).toFixed(1)}B` : `${Math.round(v / 10)}k`
+  }
+  return Math.abs(v) >= 10000 ? `${(v / 10000).toFixed(1)}亿` : `${Math.round(v)}万`
+}
 
 /* ---------- Tabs ---------- */
 type ChartTab = 'cashflow' | 'degradation' | 'sensitivity'
-const CHART_TABS: { key: ChartTab; label: string }[] = [
-  { key: 'cashflow', label: '现金流' },
-  { key: 'degradation', label: '发电量衰减' },
-  { key: 'sensitivity', label: '敏感性分析' },
+const CHART_TABS: { key: ChartTab; labelKey: string }[] = [
+  { key: 'cashflow', labelKey: 'aitool.results.tabCashflow' },
+  { key: 'degradation', labelKey: 'aitool.results.tabDegradation' },
+  { key: 'sensitivity', labelKey: 'aitool.results.tabSensitivity' },
 ]
 
 interface Props {
@@ -111,6 +116,8 @@ interface Props {
 }
 
 export default function ResultsPanel({ metrics, onGenerate, generating }: Props) {
+  const { lang, t } = useLang()
+  const en = lang === 'en'
   const [tab, setTab] = useState<ChartTab>('cashflow')
   const m = metrics
 
@@ -139,42 +146,52 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
   const tornadoData = m.sensitivity.map((s) => {
     const lo = Math.min(s.low ?? baseIRR, s.high ?? baseIRR)
     const hi = Math.max(s.low ?? baseIRR, s.high ?? baseIRR)
-    return { name: s.label, min: lo, range: Math.max(0.01, hi - lo), lo, hi }
+    return { name: t(`aitool.sensitivity.${s.labelKey}`), min: lo, range: Math.max(0.01, hi - lo), lo, hi }
   })
 
   return (
     <div className="flex flex-col gap-8 p-6 lg:p-8">
       {/* 核心指标条 */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <MetricCard label="资本金 IRR / EQUITY IRR" sub={m.equityIRR !== null && m.equityIRR >= 10 ? '优于行业基准区间' : '行业基准 8–12%'} delay={0}>
+        <MetricCard
+          label={t('aitool.results.equityIrr')}
+          sub={
+            m.equityIRR !== null && m.equityIRR >= 10
+              ? t('aitool.results.irrAbove')
+              : t('aitool.results.irrBase')
+          }
+          delay={0}
+        >
           <span className={irrColor}>
             <TweenNumber value={m.equityIRR} format={(v) => v.toFixed(1)} />
             <span className="ml-1 text-base font-medium">%</span>
           </span>
         </MetricCard>
         <MetricCard
-          label={m.isStorage ? 'LCOS 度电成本 / 元每千瓦时' : 'LCOE 度电成本 / 元每千瓦时'}
-          sub="全生命周期成本现值 ÷ 电量现值"
+          label={m.isStorage ? t('aitool.results.lcos') : t('aitool.results.lcoe')}
+          sub={t('aitool.results.lcoeSub')}
           delay={0.08}
         >
           <span className="text-paper">
             <TweenNumber value={m.lcoe} format={(v) => v.toFixed(3)} />
-            <span className="ml-1 text-base font-medium text-dim">元/kWh</span>
+            <span className="ml-1 text-base font-medium text-dim">
+              {t('aitool.results.unitYuanKwh')}
+            </span>
           </span>
         </MetricCard>
-        <MetricCard label="动态投资回收期 / DPP" sub="全投资口径 · 折现率 8%" delay={0.16}>
+        <MetricCard label={t('aitool.results.dpp')} sub={t('aitool.results.investBasis')} delay={0.16}>
           <span className="text-paper">
             <TweenNumber value={m.dynamicPayback} format={(v) => v.toFixed(1)} />
-            <span className="ml-1 text-base font-medium text-dim">年</span>
+            <span className="ml-1 text-base font-medium text-dim">{t('aitool.results.unitYear')}</span>
           </span>
         </MetricCard>
-        <MetricCard label="项目净现值 NPV" sub="全投资口径 · 折现率 8%" delay={0.24}>
+        <MetricCard label={t('aitool.results.npv')} sub={t('aitool.results.investBasis')} delay={0.24}>
           <span className={m.npv >= 0 ? 'text-volt-400' : 'text-danger'}>
             <TweenNumber
               value={m.npv / 10000}
               format={(v) => (Math.abs(v) >= 0.01 ? v.toFixed(2) : '0.00')}
             />
-            <span className="ml-1 text-base font-medium text-dim">亿元</span>
+            <span className="ml-1 text-base font-medium text-dim">{t('aitool.results.unitYi')}</span>
           </span>
         </MetricCard>
       </div>
@@ -182,26 +199,32 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
       {/* 副行指标 */}
       <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-dim">
         <span>
-          项目全投资 IRR{' '}
+          {t('aitool.results.projectIrr')}{' '}
           <span className="ml-1 font-mono tabular-nums text-mist">{fmtPct(m.projectIRR)}%</span>
         </span>
         <span>
-          静态回收期{' '}
-          <span className="ml-1 font-mono tabular-nums text-mist">{fmtYears(m.staticPayback)} 年</span>
+          {t('aitool.results.staticPayback')}{' '}
+          <span className="ml-1 font-mono tabular-nums text-mist">
+            {fmtYears(m.staticPayback)} {t('aitool.results.unitYear')}
+          </span>
         </span>
         <span>
-          首年{m.isStorage ? '放电量' : '发电量'}{' '}
-          <span className="ml-1 font-mono tabular-nums text-mist">{fmtEnergy(m.firstYearGeneration)}</span>
+          {m.isStorage ? t('aitool.results.firstYearDischarge') : t('aitool.results.firstYearGen')}{' '}
+          <span className="ml-1 font-mono tabular-nums text-mist">
+            {fmtEnergy(m.firstYearGeneration, lang)}
+          </span>
         </span>
         <span>
-          运营期总电量{' '}
-          <span className="ml-1 font-mono tabular-nums text-mist">{fmtEnergy(m.totalGeneration)}</span>
+          {t('aitool.results.totalEnergy')}{' '}
+          <span className="ml-1 font-mono tabular-nums text-mist">
+            {fmtEnergy(m.totalGeneration, lang)}
+          </span>
         </span>
         <span>
-          总投资{' '}
-          <span className="ml-1 font-mono tabular-nums text-mist">{fmtMoneyWan(m.capex)}</span>
+          {t('aitool.results.totalCapex')}{' '}
+          <span className="ml-1 font-mono tabular-nums text-mist">{fmtMoneyWan(m.capex, lang)}</span>
           <span className="ml-2 text-dim">
-            （资本金 {fmtMoneyWan(m.equity)}）
+            {t('aitool.results.equityParen').replace('{v}', fmtMoneyWan(m.equity, lang))}
           </span>
         </span>
       </div>
@@ -209,17 +232,17 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
       {/* 图表区 */}
       <div>
         <div className="mb-4 flex items-center gap-1 border-b border-line">
-          {CHART_TABS.map((t) => (
+          {CHART_TABS.map((tabDef) => (
             <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
+              key={tabDef.key}
+              onClick={() => setTab(tabDef.key)}
               className={cn(
                 'relative px-4 py-2.5 text-sm font-medium transition-colors',
-                tab === t.key ? 'text-paper' : 'text-dim hover:text-mist',
+                tab === tabDef.key ? 'text-paper' : 'text-dim hover:text-mist',
               )}
             >
-              {t.label}
-              {tab === t.key && (
+              {t(tabDef.labelKey)}
+              {tab === tabDef.key && (
                 <motion.span
                   layoutId="aitool-chart-tab"
                   className="absolute inset-x-2 -bottom-px h-0.5 bg-gradient-to-r from-solar-400 to-volt-400"
@@ -248,7 +271,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                   interval={Math.max(0, Math.floor(cashflowData.length / 10) - 1)}
                 />
                 <YAxis
-                  tickFormatter={fmtWanAxis}
+                  tickFormatter={(v: number) => fmtWanAxis(v, en)}
                   tick={{ fill: C_TICK, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   tickLine={false}
                   axisLine={false}
@@ -257,10 +280,10 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                 <Tooltip
                   contentStyle={tooltipStyle}
                   formatter={(value: number, name: string) => [
-                    `${fmtNumber(value)} 万元`,
-                    name === 'net' ? '资本金净现金流' : '资本金累计现金流',
+                    `${fmtNumber(value, 0, lang)} ${t('aitool.results.moneyUnit')}`,
+                    name === 'net' ? t('aitool.results.ttNetCf') : t('aitool.results.ttCumCf'),
                   ]}
-                  labelFormatter={(l) => `第 ${String(l).slice(1)} 年`}
+                  labelFormatter={(l) => t('aitool.results.ttYear').replace('{y}', String(l).slice(1))}
                 />
                 <ReferenceLine y={0} stroke="rgba(148,163,184,0.24)" />
                 <Bar dataKey="net" radius={[3, 3, 0, 0]} animationDuration={500}>
@@ -294,7 +317,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                 />
                 <YAxis
                   yAxisId="left"
-                  tickFormatter={(v: number) => fmtEnergy(v).replace(' kWh', '')}
+                  tickFormatter={(v: number) => fmtEnergy(v, lang).replace(' kWh', '')}
                   tick={{ fill: C_TICK, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   tickLine={false}
                   axisLine={false}
@@ -303,7 +326,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tickFormatter={(v: number) => fmtEnergy(v).replace(' kWh', '')}
+                  tickFormatter={(v: number) => fmtEnergy(v, lang).replace(' kWh', '')}
                   tick={{ fill: C_TICK, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   tickLine={false}
                   axisLine={false}
@@ -312,10 +335,10 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                 <Tooltip
                   contentStyle={tooltipStyle}
                   formatter={(value: number, name: string) => [
-                    fmtEnergy(value),
-                    name === 'annual' ? '当年电量' : '累计电量',
+                    fmtEnergy(value, lang),
+                    name === 'annual' ? t('aitool.results.ttAnnual') : t('aitool.results.ttCumulative'),
                   ]}
-                  labelFormatter={(l) => `第 ${String(l).slice(1)} 年`}
+                  labelFormatter={(l) => t('aitool.results.ttYear').replace('{y}', String(l).slice(1))}
                 />
                 <Area
                   yAxisId="left"
@@ -359,7 +382,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                 <YAxis
                   type="category"
                   dataKey="name"
-                  width={110}
+                  width={en ? 150 : 110}
                   tick={{ fill: '#9AA8BF', fontSize: 12 }}
                   tickLine={false}
                   axisLine={false}
@@ -368,8 +391,8 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                   contentStyle={tooltipStyle}
                   formatter={(_v: number, _n: string, item: { payload?: { lo: number; hi: number } }) => {
                     const p = item?.payload
-                    if (!p) return ['', '资本金 IRR 区间']
-                    return [`${p.lo.toFixed(1)}% ~ ${p.hi.toFixed(1)}%`, '资本金 IRR 区间']
+                    if (!p) return ['', t('aitool.results.ttIrrRange')]
+                    return [`${p.lo.toFixed(1)}% ~ ${p.hi.toFixed(1)}%`, t('aitool.results.ttIrrRange')]
                   }}
                 />
                 <ReferenceLine
@@ -377,7 +400,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
                   stroke={C_MAIN}
                   strokeDasharray="4 3"
                   label={{
-                    value: `基准 ${baseIRR.toFixed(1)}%`,
+                    value: t('aitool.results.baseLine').replace('{v}', baseIRR.toFixed(1)),
                     position: 'top',
                     fill: C_MAIN,
                     fontSize: 11,
@@ -395,9 +418,7 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
           )}
         </motion.div>
         {tab === 'sensitivity' && (
-          <p className="mt-2 text-xs text-dim">
-            各因素对资本金 IRR 的影响区间（其余参数保持当前值），按影响幅度排序。
-          </p>
+          <p className="mt-2 text-xs text-dim">{t('aitool.results.sensNote')}</p>
         )}
       </div>
 
@@ -414,11 +435,9 @@ export default function ResultsPanel({ metrics, onGenerate, generating }: Props)
           )}
         >
           <Sparkles className={cn('h-5 w-5', generating && 'animate-pulse')} />
-          {generating ? 'AI 正在生成报告…' : '生成 AI 投资解读报告'}
+          {generating ? t('aitool.results.generating') : t('aitool.results.generate')}
         </button>
-        <p className="mt-3 text-center text-xs text-dim">
-          由 AI 大模型基于您的参数与测算结果生成 · 每 IP 每日限 20 次
-        </p>
+        <p className="mt-3 text-center text-xs text-dim">{t('aitool.results.generateNote')}</p>
       </div>
     </div>
   )

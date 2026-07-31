@@ -2,31 +2,21 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const ITEMS = [
-  {
-    no: '01',
-    title: '长期主义',
-    body: '电站是 25 年的资产。我们以持有人的耐心做每一笔投资，不追逐短期价差，只赚取时间与运营的钱。',
-  },
-  {
-    no: '02',
-    title: '数据驱动',
-    body: '从辐照资源到限电率，从电价政策到设备衰减，每一个决策都建立在数据模型之上——这也是我们开放 AI 评估工具的原因。',
-  },
-  {
-    no: '03',
-    title: '产业共生',
-    body: '与开发商、电网、金融机构与地方政府共建生态，让绿色资产的价值链每个环节都能获益。',
-  },
-]
-
 /** ScrollTrigger pin 叙事：三段理念依次点亮 */
 export default function PhilosophySection() {
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
+
+  const items = [
+    { no: '01', title: t('home.philosophy.items.longterm.title'), body: t('home.philosophy.items.longterm.body') },
+    { no: '02', title: t('home.philosophy.items.data.title'), body: t('home.philosophy.items.data.body') },
+    { no: '03', title: t('home.philosophy.items.symbiosis.title'), body: t('home.philosophy.items.symbiosis.body') },
+  ]
 
   // 必须用 useLayoutEffect：pin 会把 section 移进 pin-spacer（脱离 <main>），
   // 清理必须在 React 提交删除之前同步 revert 回原始父节点，
@@ -71,7 +61,7 @@ export default function PhilosophySection() {
             Philosophy
           </p>
           <h2 className="mt-4 font-serif text-[clamp(1.75rem,3.2vw,2.5rem)] font-bold leading-[1.2] text-paper">
-            我们的投资信条
+            {t('home.philosophy.title')}
           </h2>
           {/* progress dots */}
           <div className="mt-10 hidden items-start gap-4 lg:flex">
@@ -82,7 +72,7 @@ export default function PhilosophySection() {
               />
             </div>
             <div className="flex h-32 flex-col justify-between">
-              {ITEMS.map((it, i) => (
+              {items.map((it, i) => (
                 <span
                   key={it.no}
                   className={cn(
@@ -97,7 +87,7 @@ export default function PhilosophySection() {
 
         {/* right cards */}
         <div className="flex flex-col gap-6 lg:w-[60%]">
-          {ITEMS.map((it, i) => {
+          {items.map((it, i) => {
             const isActive = i === active
             return (
               <div

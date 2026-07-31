@@ -6,6 +6,7 @@ import { trpc } from '@/providers/trpc'
 import type { InsightVideo } from './data'
 import { formatDate } from './data'
 import CategoryBadge from './CategoryBadge'
+import { useLang } from '@/i18n'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 interface Props {
@@ -31,6 +32,7 @@ const MD_CLASSES = [
 
 /** 视频详情模态：左播放器 / 右 AI 全文解读 */
 export default function VideoDetailDialog({ video, open, onOpenChange }: Props) {
+  const { t } = useLang()
   const isFallback = (video?.id ?? 0) < 0
   // 后端条目追加拉取 aiContent 全文；fallback 条目自带全文
   const detailQuery = trpc.videos.detail.useQuery(
@@ -55,7 +57,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
         className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl gap-0 overflow-hidden rounded-2xl border-line bg-ink-900 p-0 shadow-[0_24px_80px_-16px_rgba(0,0,0,0.8)] data-[state=open]:animate-none sm:rounded-2xl"
         aria-describedby={undefined}
       >
-        <DialogTitle className="sr-only">{video?.aiTitle || video?.title || '视频详情'}</DialogTitle>
+        <DialogTitle className="sr-only">{video?.aiTitle || video?.title || t('insights.dialog.titleFallback')}</DialogTitle>
         {video && (
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 24 }}
@@ -85,7 +87,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-dim">
                   <span className="flex items-center gap-1.5">
                     <Youtube className="h-3.5 w-3.5" />
-                    {video.channelTitle || 'YouTube 频道'}
+                    {video.channelTitle || t('insights.grid.channelFallback')}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5" />
@@ -98,7 +100,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                     className="flex items-center gap-1.5 text-volt-400 transition-colors hover:text-volt-300"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
-                    YouTube 原链
+                    {t('insights.dialog.originalLink')}
                   </a>
                 </div>
               </motion.div>
@@ -125,7 +127,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                   className="mt-4 flex items-center gap-2 text-xs font-medium text-volt-400"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
-                  AI 深度解读
+                  {t('insights.dialog.aiDeepLabel')}
                 </motion.p>
 
                 <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
@@ -142,7 +144,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                   ) : html ? (
                     <div className={MD_CLASSES} dangerouslySetInnerHTML={{ __html: html }} />
                   ) : (
-                    <p className="mt-3 text-sm leading-7 text-dim">暂无 AI 解读正文，可直接观看视频。</p>
+                    <p className="mt-3 text-sm leading-7 text-dim">{t('insights.dialog.noContent')}</p>
                   )}
                 </motion.div>
 
@@ -150,7 +152,7 @@ export default function VideoDetailDialog({ video, open, onOpenChange }: Props) 
                   variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
                   className="mt-6 border-t border-line pt-4 font-mono text-[10px] leading-5 tracking-[0.06em] text-dim"
                 >
-                  本解读由 AI 生成，内容来自公开视频，版权归原频道所有
+                  {t('insights.dialog.disclaimer')}
                 </motion.p>
               </motion.div>
             </div>

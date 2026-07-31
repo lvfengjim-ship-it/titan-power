@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { CATEGORIES } from './data'
 import type { CategoryKey } from './data'
+import { useLang } from '@/i18n'
 import { cn } from '@/lib/utils'
 import {
   Select,
@@ -57,6 +58,7 @@ export default function FilterBar({
   total,
   isFallback,
 }: Props) {
+  const { t } = useLang()
   const [input, setInput] = useState(keyword)
 
   // 外部（术语卡）回填关键词时同步输入框
@@ -90,7 +92,7 @@ export default function FilterBar({
                       : 'border-transparent text-mist hover:bg-ink-700/60 hover:text-paper',
                   )}
                 >
-                  {c.label}
+                  {t(`insights.filter.categories.${c.key}`)}
                   {active && (
                     <motion.span
                       layoutId="insights-tab-bar"
@@ -116,7 +118,7 @@ export default function FilterBar({
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="搜索关键词，如：核聚变 / electrolyzer…"
+                placeholder={t('insights.filter.searchPlaceholder')}
                 className="w-full bg-transparent text-sm text-paper outline-none placeholder:text-dim"
               />
             </div>
@@ -125,8 +127,8 @@ export default function FilterBar({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="border-line bg-ink-800 text-paper">
-                <SelectItem value="latest">最新优先</SelectItem>
-                <SelectItem value="views">最多播放</SelectItem>
+                <SelectItem value="latest">{t('insights.filter.sortLatest')}</SelectItem>
+                <SelectItem value="views">{t('insights.filter.sortViews')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

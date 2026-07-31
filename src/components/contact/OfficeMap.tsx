@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Building2 } from 'lucide-react'
 import SectionHeading from '@/components/SectionHeading'
 import Reveal from '@/components/Reveal'
+import { useLang } from '@/i18n'
 import { cn } from '@/lib/utils'
 
 /** 地图定位点（无限涟漪隔离在 memo 微组件中） */
@@ -53,22 +54,19 @@ const MapPinDot = memo(function MapPinDot({
   )
 })
 
-const OFFICES = [
-  { name: '海口总部（华南）', role: '投资决策 · 并购交易 · 数字化平台' },
-  { name: '华东区（上海 · 温州 · 镇江）', role: '分布式项目开发 · 运维响应' },
-  { name: '华北区（北京 · 青岛）', role: '项目管理 · 政府事务' },
-]
+const OFFICE_KEYS = ['hq', 'east', 'north'] as const
 
 /** Section 3 — 总部与区域布局：抽象版图 + 机构行 */
 export default function OfficeMap() {
+  const { t } = useLang()
   return (
     <section className="mx-auto max-w-[1280px] px-6 py-24 lg:px-10">
       <style>{`@keyframes tp-office-ripple{0%{transform:translate(-50%,-50%) scale(0.4);opacity:0.9}70%{opacity:0.25}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}`}</style>
       <Reveal>
         <SectionHeading
-          eyebrow="OFFICES"
-          title="总部与区域布局"
-          description="以海口为投资决策中枢，华东、华北两大区域机构贴近项目一线，形成华东、华南、华北主要业务区域的响应网络。"
+          eyebrow={t('contact.map.eyebrow')}
+          title={t('contact.map.title')}
+          description={t('contact.map.desc')}
         />
       </Reveal>
 
@@ -85,14 +83,14 @@ export default function OfficeMap() {
             >
               <img
                 src="/map-china.svg"
-                alt="中国版图点阵地图"
+                alt={t('contact.map.imgAlt')}
                 className="h-auto w-full select-none opacity-90"
                 draggable={false}
               />
               {/* 海口 HQ · 华东（上海）· 华北（北京） */}
-              <MapPinDot x={59.5} y={82.5} tone="gold" label="海口 HQ" delay={0.3} />
-              <MapPinDot x={73.5} y={52.5} tone="volt" label="华东 · 上海" delay={0.45} />
-              <MapPinDot x={67.7} y={37.4} tone="volt" label="华北 · 北京" delay={0.6} />
+              <MapPinDot x={59.5} y={82.5} tone="gold" label={t('contact.map.pinHq')} delay={0.3} />
+              <MapPinDot x={73.5} y={52.5} tone="volt" label={t('contact.map.pinEast')} delay={0.45} />
+              <MapPinDot x={67.7} y={37.4} tone="volt" label={t('contact.map.pinNorth')} delay={0.6} />
             </motion.div>
             <p className="mt-4 font-mono text-[10px] tracking-[0.15em] text-dim">
               HEADQUARTERS & REGIONAL OFFICES · DOT MAP ILLUSTRATION
@@ -102,15 +100,15 @@ export default function OfficeMap() {
 
         {/* 机构行 5 列 */}
         <div className="flex flex-col justify-center gap-5 lg:col-span-5">
-          {OFFICES.map((o, i) => (
-            <Reveal key={o.name} delay={150 + i * 100} y={24}>
+          {OFFICE_KEYS.map((key, i) => (
+            <Reveal key={key} delay={150 + i * 100} y={24}>
               <div className="flex items-start gap-4 rounded-2xl border border-line bg-ink-800 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-line-strong">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line bg-ink-850 text-solar-400">
                   <Building2 className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-paper">{o.name}</h3>
-                  <p className="mt-1 text-sm leading-6 text-dim">{o.role}</p>
+                  <h3 className="text-base font-bold text-paper">{t(`contact.map.offices.${key}.name`)}</h3>
+                  <p className="mt-1 text-sm leading-6 text-dim">{t(`contact.map.offices.${key}.role`)}</p>
                 </div>
               </div>
             </Reveal>

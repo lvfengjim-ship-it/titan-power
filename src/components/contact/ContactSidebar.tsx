@@ -3,32 +3,34 @@ import { MapPin, Mail, Building2, Clock, Sparkles, ArrowRight } from 'lucide-rea
 import GlowCard from '@/components/GlowCard'
 import QRConnectCard from '@/components/QRConnectCard'
 import Reveal from '@/components/Reveal'
+import { useLang } from '@/i18n'
 
-const CONTACT_ROWS = [
-  { icon: MapPin, label: '总部地址', value: '海南省海南生态软件园A17幢' },
-  { icon: Building2, label: '区域办事处', value: '北京 · 上海 · 青岛 · 温州 · 镇江' },
-  { icon: Mail, label: '邮箱', value: 'sales@titan-power.cn' },
-  { icon: Clock, label: '工作时间', value: '工作日 9:00–18:00' },
-]
+const CONTACT_ROW_KEYS = [
+  { icon: MapPin, key: 'hq' },
+  { icon: Building2, key: 'region' },
+  { icon: Mail, key: 'mail' },
+  { icon: Clock, key: 'hours' },
+] as const
 
 /** Section 2.2 — 信息侧栏（3 卡纵向堆叠） */
 export default function ContactSidebar() {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-6">
       {/* 联系方式卡 */}
       <Reveal delay={0} y={24}>
-        <GlowCard title="联系方式">
+        <GlowCard title={t('contact.sidebar.cardTitle')}>
           <ul className="mt-5 space-y-4">
-            {CONTACT_ROWS.map((row) => {
+            {CONTACT_ROW_KEYS.map((row) => {
               const Icon = row.icon
               return (
-                <li key={row.label} className="flex items-start gap-3">
+                <li key={row.key} className="flex items-start gap-3">
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-ink-850 text-solar-400">
                     <Icon className="h-4 w-4" />
                   </span>
                   <span>
-                    <span className="block text-xs text-dim">{row.label}</span>
-                    <span className="mt-0.5 block text-sm text-paper">{row.value}</span>
+                    <span className="block text-xs text-dim">{t(`contact.sidebar.rows.${row.key}.label`)}</span>
+                    <span className="mt-0.5 block text-sm text-paper">{t(`contact.sidebar.rows.${row.key}.value`)}</span>
                   </span>
                 </li>
               )
@@ -40,24 +42,24 @@ export default function ContactSidebar() {
       {/* 关注我们卡 */}
       <Reveal delay={120} y={24}>
         <div className="rounded-2xl border border-line bg-ink-800 p-7">
-          <h3 className="font-sans text-lg font-bold text-paper">关注我们</h3>
+          <h3 className="font-sans text-lg font-bold text-paper">{t('contact.sidebar.follow.title')}</h3>
           <div className="mt-5 grid grid-cols-2 gap-4">
             <QRConnectCard
               src="/qr-wechat-official.png"
-              platform="公众号"
-              status="申请中"
+              platform={t('contact.sidebar.follow.official')}
+              status={t('contact.sidebar.follow.status')}
               accent="gold"
               compact
             />
             <QRConnectCard
               src="/qr-wechat-channel.png"
-              platform="视频号"
-              status="申请中"
+              platform={t('contact.sidebar.follow.channel')}
+              status={t('contact.sidebar.follow.status')}
               accent="volt"
               compact
             />
           </div>
-          <p className="mt-4 text-xs leading-6 text-dim">前沿洞察与行业动态将同步推送。</p>
+          <p className="mt-4 text-xs leading-6 text-dim">{t('contact.sidebar.follow.note')}</p>
         </div>
       </Reveal>
 
@@ -72,8 +74,8 @@ export default function ContactSidebar() {
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-base font-bold text-paper">先自己算一算？</p>
-              <p className="mt-0.5 text-sm text-mist">AI 投资评估工具，免费开放</p>
+              <p className="text-base font-bold text-paper">{t('contact.sidebar.quick.title')}</p>
+              <p className="mt-0.5 text-sm text-mist">{t('contact.sidebar.quick.desc')}</p>
             </div>
           </div>
           <ArrowRight className="h-5 w-5 shrink-0 text-volt-400 transition-transform duration-300 group-hover:translate-x-1.5" />

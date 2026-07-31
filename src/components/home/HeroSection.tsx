@@ -3,19 +3,11 @@ import { Link } from 'react-router'
 import { Sparkles } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useLang } from '@/i18n'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const EnergyGlobe = lazy(() => import('./EnergyGlobe'))
-
-const TITLE = '驭光 · 捕风 · 储未来'
-
-const HERO_STATS = [
-  { label: '业务聚焦', value: '光伏 · 风电 · 储能' },
-  { label: '业务模式', value: '投资 · 并购 · 运营' },
-  { label: '投资方法论', value: 'AI 驱动评估' },
-  { label: '持有理念', value: '长期主义 · 全周期' },
-]
 
 /** 静态星点背景（150 颗 1px 白点） */
 function Starfield() {
@@ -46,8 +38,17 @@ function Starfield() {
 }
 
 export default function HeroSection() {
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
   const [mounted, setMounted] = useState(false)
+
+  const title = t('home.hero.title')
+  const heroStats = [
+    { key: 'focus', label: t('home.hero.stats.focus.label'), value: t('home.hero.stats.focus.value') },
+    { key: 'model', label: t('home.hero.stats.model.label'), value: t('home.hero.stats.model.value') },
+    { key: 'method', label: t('home.hero.stats.method.label'), value: t('home.hero.stats.method.value') },
+    { key: 'holding', label: t('home.hero.stats.holding.label'), value: t('home.hero.stats.holding.value') },
+  ]
 
   useEffect(() => setMounted(true), [])
 
@@ -140,17 +141,17 @@ export default function HeroSection() {
             className="mt-6 font-serif text-[clamp(2.75rem,6.5vw,5.5rem)] font-black leading-[1.08] tracking-[0.01em] text-paper"
             style={{ perspective: '800px' }}
           >
-            {TITLE.split('').map((ch, i) => (
+            {title.split('').map((ch, i) => (
               <span key={i} className="hero-char inline-block opacity-0 will-change-transform">
                 {ch === ' ' ? ' ' : ch}
               </span>
             ))}
           </h1>
           <p className="hero-fade mt-4 font-serif text-[clamp(1.25rem,2.4vw,1.75rem)] font-bold leading-snug text-paper/90 opacity-0">
-            让每一度绿电，都值得投资
+            {t('home.hero.slogan')}
           </p>
           <p className="hero-fade mt-6 max-w-xl text-lg leading-[1.8] text-mist opacity-0">
-            彭田环保专注光伏、风电与储能电站的投资、并购与运营，以资本与专业运营能力，加速中国分布式能源的价值释放。
+            {t('home.hero.lead')}
           </p>
           <div className="hero-fade mt-10 flex flex-wrap gap-4 opacity-0">
             <Link
@@ -158,13 +159,13 @@ export default function HeroSection() {
               className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-7 py-3.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97]"
             >
               <Sparkles className="h-4 w-4" />
-              免费体验 AI 投资评估
+              {t('home.hero.ctaAi')}
             </Link>
             <Link
               to="/business"
               className="rounded-xl border border-line-strong px-7 py-3.5 text-sm font-medium text-paper transition-all duration-300 hover:border-solar-400 hover:bg-solar-400/[0.08] hover:text-solar-300"
             >
-              了解我们的业务
+              {t('home.hero.ctaBusiness')}
             </Link>
           </div>
         </div>
@@ -181,8 +182,8 @@ export default function HeroSection() {
       {/* bottom data bar */}
       <div className="hero-bar relative z-10 border-t border-line bg-abyss/40 opacity-0 backdrop-blur-sm">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-line px-6 lg:grid-cols-4 lg:px-10">
-          {HERO_STATS.map((s) => (
-            <div key={s.label} className="px-5 py-4">
+          {heroStats.map((s) => (
+            <div key={s.key} className="px-5 py-4">
               <p className="font-mono text-xs text-dim">{s.label}</p>
               <p className="mt-1 font-display text-lg font-bold text-paper tabular-nums">{s.value}</p>
             </div>

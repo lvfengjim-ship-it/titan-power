@@ -10,41 +10,14 @@ import ParamsPanel from '@/components/aitool/ParamsPanel'
 import ResultsPanel from '@/components/aitool/ResultsPanel'
 import ReportPanel from '@/components/aitool/ReportPanel'
 import { useAiReport } from '@/components/aitool/useReport'
-import { computeMetrics, PRESETS, PROJECT_TYPE_LABEL } from '@/components/aitool/finance'
+import { computeMetrics, PRESETS } from '@/components/aitool/finance'
 import type { ProjectParams, ProjectType } from '@/components/aitool/finance'
+import { useLang } from '@/i18n'
 
-const FAQ_ITEMS = [
-  {
-    q: '测算结果准确吗？',
-    a: '模型基于行业通用口径（IRR 二分迭代、LCOE 全生命周期成本、等额本息、所得税三免三减半等），默认参数为典型值。实际项目需结合资源评估、接入条件与地方政策逐项核实，测算结果仅供前期筛选参考。',
-  },
-  {
-    q: 'AI 报告是如何生成的？',
-    a: '您的项目参数与前端已计算的财务指标经后端发送至 AI 大模型，模型结合行业基准知识生成中文投资解读，并以 SSE 流式逐字返回。报告包含财务可行性、风险提示、敏感性解读与综合评级。',
-  },
-  {
-    q: '我的项目数据会被保存吗？',
-    a: '不会。参数仅用于当次计算与报告生成，在您的浏览器内完成测算，不做任何持久化存储。',
-  },
-  {
-    q: '支持哪些项目类型？',
-    a: '当前支持四类：分布式光伏（自发自用 + 余电上网双电价口径）、风电、储能（容量租赁 + 现货套利模式），以及光伏+储能一体化项目。最小评估规模：光伏 0.5 MW、储能 0.5 MW、风电 6 MW。',
-  },
-  {
-    q: '光伏+储能一体化的测算口径？',
-    a: '光伏部分与纯光伏一致（自发自用 + 余电上网）；储能收入 = 储能年放电量 × 峰谷价差，其中年放电量 = 储能容量 × 年循环次数 × 充放效率；储能充电按机会成本计价（充电量 = 放电量 ÷ 充放效率，按上网电价从储能收入中扣除，视为使用光伏余电充电）。总投资为光伏与储能投资之和，IRR、LCOE、NPV 与回收期均基于合并现金流计算。',
-  },
-  {
-    q: '分布式光伏的电价如何设置？',
-    a: '公司项目以分布式光伏为主，采用「自发自用 + 余电上网」模式：收入 = 年发电量 ×（自用比例 × 客户自用电价 + 上网比例 × 上网电价），上网比例 = 100% − 自用比例，随自用比例滑块自动联动。',
-  },
-  {
-    q: '收费标准？',
-    a: '面向行业同仁完全免费，无需注册。为控制成本，AI 报告每 IP 每日限 20 次，财务测算本身不限次数。',
-  },
-]
+const FAQ_COUNT = 7
 
 export default function AiTool() {
+  const { t } = useLang()
   const [type, setType] = useState<ProjectType>('pv')
   const [params, setParams] = useState<ProjectParams>(PRESETS.pv)
   const [debounced, setDebounced] = useState<{ type: ProjectType; params: ProjectParams }>({
@@ -55,16 +28,15 @@ export default function AiTool() {
 
   // SEO
   useEffect(() => {
-    document.title = 'AI 投资评估工具 — 免费测算 IRR / LCOE / 回收期 | 彭田环保'
+    document.title = t('aitool.hero.docTitle')
     let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]')
     if (!meta) {
       meta = document.createElement('meta')
       meta.name = 'description'
       document.head.appendChild(meta)
     }
-    meta.content =
-      '免费的新能源电站投资测算工具：输入装机、电价、造价、融资参数，实时计算 IRR、LCOE、回收期，AI 生成投资解读报告。'
-  }, [])
+    meta.content = t('aitool.hero.metaDesc')
+  }, [t])
 
   // 参数变化 → 150ms 防抖后重算
   useEffect(() => {
@@ -77,16 +49,23 @@ export default function AiTool() {
     [debounced],
   )
 
-  const handleTypeChange = useCallback((t: ProjectType) => {
-    setType(t)
-    setParams(PRESETS[t])
-    toast.success(`已载入${PROJECT_TYPE_LABEL[t]}典型参数，可逐项调整`)
-  }, [])
+  const handleTypeChange = useCallback(
+    (next: ProjectType) => {
+      setType(next)
+      setParams(PRESETS[next])
+      toast.success(
+        t('aitool.toast.loadedPre') + t(`aitool.types.full.${next}`) + t('aitool.toast.loadedPost'),
+      )
+    },
+    [t],
+  )
 
   const handleReset = useCallback(() => {
     setParams(PRESETS[type])
-    toast.success(`已重置为${PROJECT_TYPE_LABEL[type]}典型参数`)
-  }, [type])
+    toast.success(
+      t('aitool.toast.resetPre') + t(`aitool.types.full.${type}`) + t('aitool.toast.resetPost'),
+    )
+  }, [type, t])
 
   const handleGenerate = useCallback(() => {
     report.generate(type, params, metrics)
@@ -128,10 +107,10 @@ export default function AiTool() {
             transition={{ duration: 0.5 }}
           >
             <Link to="/" className="font-mono transition-colors hover:text-mist">
-              首页
+              {t('common.nav.home')}
             </Link>
             <span className="font-mono text-dim/60">/</span>
-            <span className="font-mono text-mist">AI 投资评估</span>
+            <span className="font-mono text-mist">{t('aitool.hero.breadcrumb')}</span>
           </motion.nav>
 
           <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
@@ -151,7 +130,7 @@ export default function AiTool() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               >
-                AI 投资评估工具
+                {t('aitool.hero.title')}
               </motion.h1>
               <motion.p
                 className="mt-4 max-w-2xl text-base leading-[1.8] text-mist lg:text-lg"
@@ -159,8 +138,7 @@ export default function AiTool() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                输入项目参数，实时测算 IRR、LCOE 与投资回收期，并由 AI
-                大模型为您生成专业投资解读。完全免费，无需注册。
+                {t('aitool.hero.lead')}
               </motion.p>
             </div>
 
@@ -218,8 +196,8 @@ export default function AiTool() {
           <SectionHeading
             eyebrow="AI REPORT"
             eyebrowColor="volt"
-            title="AI 投资解读报告"
-            description="AI 大模型基于您的参数与实时测算结果，生成结构化的投资评估解读：收益质量、核心风险、敏感因素与综合评级。"
+            title={t('aitool.report.heading')}
+            description={t('aitool.report.headingDesc')}
           />
         </div>
         <ReportPanel type={type} report={report} onRetry={handleGenerate} />
@@ -230,12 +208,12 @@ export default function AiTool() {
         <div className="mx-auto max-w-[760px] px-6">
           <SectionHeading
             eyebrow="METHODOLOGY"
-            title="关于测算口径"
-            description="模型口径透明可查。以下为常见问题；更详细的假设请以您的尽调与财务顾问意见为准。"
+            title={t('aitool.faq.heading')}
+            description={t('aitool.faq.desc')}
           />
           <Reveal className="mt-10" y={20}>
             <Accordion type="single" collapsible className="space-y-3">
-              {FAQ_ITEMS.map((item, i) => (
+              {Array.from({ length: FAQ_COUNT }, (_, i) => ({ q: t(`aitool.faq.q${i + 1}`), a: t(`aitool.faq.a${i + 1}`) })).map((item, i) => (
                 <AccordionItem
                   key={i}
                   value={`faq-${i}`}
@@ -267,11 +245,9 @@ export default function AiTool() {
         <div className="relative mx-auto flex max-w-[1280px] flex-col items-start justify-between gap-10 px-6 py-20 lg:flex-row lg:items-center lg:px-10">
           <div className="max-w-xl">
             <h3 className="font-serif text-2xl font-bold leading-snug text-paper lg:text-3xl">
-              测算满意？让我们继续聊聊这个项目
+              {t('aitool.cta.title')}
             </h3>
-            <p className="mt-4 text-base leading-7 text-mist">
-              把您的测算参数带给彭田环保投资团队，我们将为您提供资源评估、交易结构与并购尽调的深度支持。
-            </p>
+            <p className="mt-4 text-base leading-7 text-mist">{t('aitool.cta.desc')}</p>
           </div>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -279,13 +255,13 @@ export default function AiTool() {
               className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-7 py-3.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97]"
             >
               <MessageSquare className="h-4 w-4" />
-              预约项目洽谈
+              {t('aitool.cta.primary')}
             </Link>
             <Link
               to="/business"
               className="group flex items-center gap-2 rounded-xl border border-line-strong px-7 py-3.5 text-sm font-medium text-paper transition-all duration-300 hover:border-solar-400 hover:bg-solar-400/[0.08] hover:text-solar-300"
             >
-              了解业务领域
+              {t('aitool.cta.secondary')}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>

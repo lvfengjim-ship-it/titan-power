@@ -12,13 +12,14 @@ import GlossarySection from '@/components/insights/GlossarySection'
 import SubscribeSection from '@/components/insights/SubscribeSection'
 import { FALLBACK_VIDEOS } from '@/components/insights/data'
 import type { CategoryKey, InsightVideo } from '@/components/insights/data'
+import { useLang } from '@/i18n'
 
 const PAGE_SIZE = 12
 
-/** 标题词级拆分 */
-const TITLE_WORDS = ['站在', '全球', '能源', '技术', '的', '最前沿']
-
 export default function Insights() {
+  const { t } = useLang()
+  /** 标题词级拆分（'|' 分隔，随语言切换） */
+  const titleWords = t('insights.hero.titleWords').split('|')
   const [activeTab, setActiveTab] = useState<CategoryKey>('all')
   const [keyword, setKeyword] = useState('')
   const [sort, setSort] = useState<SortKey>('latest')
@@ -29,15 +30,12 @@ export default function Insights() {
 
   // SEO
   useEffect(() => {
-    document.title = '前沿技术洞察 — 核能·氢能·储能海外前沿视频 AI 解读 | 彭田环保'
+    document.title = t('insights.seo.title')
     const meta = document.querySelector('meta[name="description"]')
     if (meta) {
-      meta.setAttribute(
-        'content',
-        '每日自动聚合海外核能、氢能、储能、光伏、风电前沿技术视频，AI 中文解读，免费的行业技术普及平台。',
-      )
+      meta.setAttribute('content', t('insights.seo.desc'))
     }
-  }, [])
+  }, [t])
 
   // 条件变化时重置分页（事件处理器内同步重置）
   const handleTabChange = (t: CategoryKey) => {
@@ -107,9 +105,9 @@ export default function Insights() {
   }
 
   const heroBadges = [
-    { icon: Rss, text: isFallback ? '缓存数据 · 接口恢复后自动更新' : '每日 08:00 自动更新' },
-    { icon: Globe, text: '来源：国内公开媒体以及 Youtube 公开渠道' },
-    { icon: Sparkles, text: 'AI 解读：大模型' },
+    { icon: Rss, text: isFallback ? t('insights.hero.badgeCached') : t('insights.hero.badgeLive') },
+    { icon: Globe, text: t('insights.hero.badgeSource') },
+    { icon: Sparkles, text: t('insights.hero.badgeAi') },
   ]
 
   return (
@@ -139,10 +137,10 @@ export default function Insights() {
             transition={{ duration: 0.5 }}
           >
             <Link to="/" className="font-mono transition-colors hover:text-mist">
-              首页
+              {t('common.nav.home')}
             </Link>
             <span className="font-mono text-dim/60">/</span>
-            <span className="font-mono text-mist">前沿洞察</span>
+            <span className="font-mono text-mist">{t('common.nav.insights')}</span>
           </motion.nav>
 
           <motion.p
@@ -152,11 +150,11 @@ export default function Insights() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <span className="inline-block h-px w-6 bg-volt-400" />
-            Global Energy Insights
+            {t('insights.hero.eyebrow')}
           </motion.p>
 
           <h1 className="mt-4 font-serif text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.15] text-paper">
-            {TITLE_WORDS.map((w, i) => (
+            {titleWords.map((w, i) => (
               <motion.span
                 key={w + i}
                 className="inline-block"
@@ -175,8 +173,7 @@ export default function Insights() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            我们的系统每日自动抓取海外前沿技术视频——从小型模块化核反应堆到绿氢电解槽——并由
-            AI 生成中文解读，免费开放给每一位行业同仁。
+            {t('insights.hero.desc')}
           </motion.p>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -227,7 +224,7 @@ export default function Insights() {
         ) : shown.length === 0 ? (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-line-strong py-24 text-center">
             <SearchX className="h-10 w-10 text-dim" />
-            <p className="text-sm text-mist">没有找到相关视频，换个关键词试试。</p>
+            <p className="text-sm text-mist">{t('insights.grid.empty')}</p>
             <button
               onClick={() => {
                 setKeyword('')
@@ -235,7 +232,7 @@ export default function Insights() {
               }}
               className="rounded-xl border border-volt-400/40 px-5 py-2 text-sm text-volt-300 transition-colors hover:bg-volt-400/10"
             >
-              清除筛选
+              {t('insights.grid.clearFilters')}
             </button>
           </div>
         ) : (
@@ -254,15 +251,15 @@ export default function Insights() {
                   onClick={() => setVisible((n) => n + PAGE_SIZE)}
                   className="rounded-xl border border-line-strong px-8 py-3 text-sm font-medium text-paper transition-all duration-300 hover:border-volt-400 hover:bg-volt-400/[0.08] hover:text-volt-300"
                 >
-                  加载更多（还有 {sorted.length - visible} 部）
+                  {t('insights.grid.loadMore').replace('{count}', String(sorted.length - visible))}
                 </button>
               </div>
             )}
 
             <p className="mt-10 text-center font-mono text-[10px] tracking-[0.12em] text-dim">
               {isFallback
-                ? '展示内置缓存数据 · 接口恢复后自动更新'
-                : `内容每日 08:00 自动更新 · 共 ${sorted.length} 部前沿视频`}
+                ? t('insights.grid.footCached')
+                : t('insights.grid.footLive').replace('{count}', String(sorted.length))}
             </p>
           </>
         )}
@@ -278,10 +275,7 @@ export default function Insights() {
       <SubscribeSection />
 
       {/* Section 7 — CTA Band */}
-      <CTABand
-        title="看完前沿，算清当下"
-        description="前沿技术终将落地为可投资的资产。用我们的 AI 投资评估工具，免费测算你的光伏、风电或储能项目收益。"
-      />
+      <CTABand title={t('insights.cta.title')} description={t('insights.cta.desc')} />
     </>
   )
 }

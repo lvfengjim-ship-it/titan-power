@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 
 interface Props {
   src: string
@@ -14,12 +15,14 @@ interface Props {
 export default function QRConnectCard({
   src,
   platform,
-  status = '申请中',
+  status,
   accent = 'gold',
   title,
   compact = false,
   className,
 }: Props) {
+  const { t } = useLang()
+  const statusText = status ?? t('common.footer.qr.pending')
   const border =
     accent === 'gold'
       ? 'hover:border-solar-400/50'
@@ -40,7 +43,7 @@ export default function QRConnectCard({
       >
         <img src={src} alt={platform} className="h-20 w-20 rounded-lg" width={80} height={80} />
         <p className="mt-2 text-center text-xs text-mist">{platform}</p>
-        <p className="text-center text-[10px] text-dim">{status}</p>
+        <p className="text-center text-[10px] text-dim">{statusText}</p>
       </div>
     )
   }
@@ -62,9 +65,9 @@ export default function QRConnectCard({
             badge,
           )}
         >
-          {status}
+          {statusText}
         </span>
-        <p className="mt-2 text-xs text-dim">扫码关注 · 即将开通</p>
+        <p className="mt-2 text-xs text-dim">{t('common.shared.qrHint')}</p>
       </div>
     </div>
   )

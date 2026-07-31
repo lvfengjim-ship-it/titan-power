@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/i18n'
 
 interface Props {
   eyebrow: string
@@ -19,10 +20,12 @@ export default function SectionHeading({
   title,
   description,
   linkTo,
-  linkLabel = '查看全部',
+  linkLabel,
   eyebrowColor = 'gold',
   className,
 }: Props) {
+  const { t } = useLang()
+  const labelText = linkLabel ?? t('common.shared.viewAll')
   return (
     <div
       className={cn(
@@ -56,7 +59,7 @@ export default function SectionHeading({
             to={linkTo}
             className="group inline-flex items-center gap-2 text-sm font-medium text-solar-400 transition-colors hover:text-solar-300"
           >
-            {linkLabel}
+            {labelText}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         )}

@@ -60,18 +60,37 @@ export function formatDuration(sec: number): string {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-/** 相对时间：3 天前 / 2 周前 … */
-export function timeAgo(input: Date | string | null): string {
-  if (!input) return '日期待定'
+/** 相对时间的界面文案（默认中文，可注入英文） */
+export interface TimeAgoLabels {
+  tbd: string
+  today: string
+  daysAgo: (n: number) => string
+  weeksAgo: (n: number) => string
+  monthsAgo: (n: number) => string
+  yearsAgo: (n: number) => string
+}
+
+const ZH_TIME_AGO: TimeAgoLabels = {
+  tbd: '日期待定',
+  today: '今天',
+  daysAgo: (n) => `${n} 天前`,
+  weeksAgo: (n) => `${n} 周前`,
+  monthsAgo: (n) => `${n} 个月前`,
+  yearsAgo: (n) => `${n} 年前`,
+}
+
+/** 相对时间：3 天前 / 2 周前 …（labels 可覆盖为英文） */
+export function timeAgo(input: Date | string | null, labels: TimeAgoLabels = ZH_TIME_AGO): string {
+  if (!input) return labels.tbd
   const d = input instanceof Date ? input : new Date(input)
-  if (Number.isNaN(d.getTime())) return '日期待定'
+  if (Number.isNaN(d.getTime())) return labels.tbd
   const diff = Date.now() - d.getTime()
   const day = 86400_000
-  if (diff < day) return '今天'
-  if (diff < 7 * day) return `${Math.floor(diff / day)} 天前`
-  if (diff < 30 * day) return `${Math.floor(diff / (7 * day))} 周前`
-  if (diff < 365 * day) return `${Math.floor(diff / (30 * day))} 个月前`
-  return `${Math.floor(diff / (365 * day))} 年前`
+  if (diff < day) return labels.today
+  if (diff < 7 * day) return labels.daysAgo(Math.floor(diff / day))
+  if (diff < 30 * day) return labels.weeksAgo(Math.floor(diff / (7 * day)))
+  if (diff < 365 * day) return labels.monthsAgo(Math.floor(diff / (30 * day)))
+  return labels.yearsAgo(Math.floor(diff / (365 * day)))
 }
 
 export function formatDate(input: Date | string | null): string {
