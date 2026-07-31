@@ -44,7 +44,7 @@ export default function Footer() {
           {/* brand */}
           <div>
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="彭田环保" className="h-9 w-auto" />
+              <img src="/logo.svg" alt="彭田环保" className="h-6 w-auto" />
               <div className="leading-none">
                 <p className="font-serif text-lg font-bold text-paper">彭田环保</p>
                 <p className="mt-1 font-display text-[10px] font-medium tracking-[0.3em] text-dim">
