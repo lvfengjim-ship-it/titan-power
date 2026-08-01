@@ -33,9 +33,9 @@
     --sidebar-border: 217 19% 27%;
     --sidebar-ring: 40 87% 59%;
 
-    --font-serif: 'Noto Serif SC', 'Songti SC', serif;
-    --font-sans: 'Noto Sans SC', 'PingFang SC', sans-serif;
-    --font-display: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+    --font-serif: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    --font-sans: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    --font-display: 'Space Grotesk', 'Microsoft YaHei', '微软雅黑', 'PingFang SC', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 }

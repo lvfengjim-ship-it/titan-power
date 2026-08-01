@@ -5,9 +5,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ["'Noto Serif SC'", "'Songti SC'", "serif"],
-        sans: ["'Noto Sans SC'", "'PingFang SC'", "sans-serif"],
-        display: ["'Space Grotesk'", "'Noto Sans SC'", "sans-serif"],
+        serif: ["'Microsoft YaHei'", "'微软雅黑'", "'PingFang SC'", "'Hiragino Sans GB'", "'Noto Sans SC'", "sans-serif"],
+        sans: ["'Microsoft YaHei'", "'微软雅黑'", "'PingFang SC'", "'Hiragino Sans GB'", "'Noto Sans SC'", "sans-serif"],
+        display: ["'Space Grotesk'", "'Microsoft YaHei'", "'微软雅黑'", "'PingFang SC'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
       colors: {
