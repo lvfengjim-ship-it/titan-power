@@ -4,7 +4,7 @@ export const dict = {
       title: '驭光 · 捕风 · 储未来',
       slogan: '让每一度绿电，都值得投资',
       lead: '彭田环保专注光伏、风电与储能电站的投资、并购与运营，以资本与专业运营能力，加速中国分布式能源的价值释放。',
-      ctaAi: '免费体验 AI 投资评估',
+      ctaAi: '免费体验投资评估',
       ctaBusiness: '了解我们的业务',
       stats: {
         focus: { label: '业务聚焦', value: '光伏 · 风电 · 储能' },
@@ -60,7 +60,7 @@ export const dict = {
       ai: {
         title: 'AI 驱动的投资方法论',
         desc: '内部估值模型与公开版 AI 评估工具同源，用数据与算法提升投资判断的确定性。',
-        link: '体验 AI 投资评估',
+        link: '体验投资评估',
       },
       integration: {
         title: '开发-并购-运营一体化能力',
@@ -112,7 +112,7 @@ export const dict = {
       },
     },
     insights: {
-      title: '全球能源前沿，每日由 AI 为你解读',
+      title: '全球能源前沿，每日为你解读',
       description:
         '我们的系统每日自动抓取海外核能、氢能、储能等领域的前沿技术视频，并由 AI 生成中文解读，免费开放给每一位行业同仁。',
       linkLabel: '进入前沿洞察',
@@ -140,7 +140,7 @@ export const dict = {
       title: 'Harness Sunlight · Capture Wind · Store the Future',
       slogan: 'Make every kWh of green power worth investing in',
       lead: 'PT MOMENTUM focuses on the investment, M&A, and operation of PV, wind, and energy storage power plants, unlocking the value of distributed energy in China with capital and operational excellence.',
-      ctaAi: 'Free AI Investment Evaluation',
+      ctaAi: 'Free Investment Evaluation',
       ctaBusiness: 'Explore Our Business',
       stats: {
         focus: { label: 'Focus', value: 'PV · Wind · Storage' },
@@ -196,7 +196,7 @@ export const dict = {
       ai: {
         title: 'AI-Driven Investment Methodology',
         desc: 'Our internal valuation models share the same engine as the public AI evaluation tool, using data and algorithms to make investment decisions more certain.',
-        link: 'Try the AI Investment Evaluation',
+        link: 'Try the Investment Evaluation',
       },
       integration: {
         title: 'Integrated Development, M&A & Operations',
@@ -249,7 +249,7 @@ export const dict = {
       },
     },
     insights: {
-      title: 'Global Energy Frontiers, Interpreted Daily by AI',
+      title: 'Global Energy Frontiers, Interpreted Daily',
       description:
         'Our system automatically curates cutting-edge overseas videos on nuclear, hydrogen, energy storage, and more every day, with AI-generated Chinese interpretations open free of charge to every industry professional.',
       linkLabel: 'Explore Insights',

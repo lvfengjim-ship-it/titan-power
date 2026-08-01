@@ -54,7 +54,7 @@ export const dict = {
       success: {
         title: '提交成功',
         desc: '我们已收到您的信息，将在 48 小时内通过您留下的联系方式与您沟通。',
-        next: '还可以：试试 AI 投资评估',
+        next: '还可以：试试投资评估',
       },
     },
     sidebar: {
@@ -74,7 +74,7 @@ export const dict = {
       },
       quick: {
         title: '先自己算一算？',
-        desc: 'AI 投资评估工具，免费开放',
+        desc: '投资评估工具，免费开放',
       },
     },
     map: {
@@ -110,7 +110,7 @@ export const dict = {
         },
         q4: {
           q: '如何获取 AI 评估工具的深度版？',
-          a: '公开版 AI 投资评估工具完全免费，覆盖常规财务测算与解读。深度合作客户可接入内部模型与历史项目数据库，如有需要请在合作表单中注明。',
+          a: '公开版投资评估工具完全免费，覆盖常规财务测算与解读。深度合作客户可接入内部模型与历史项目数据库，如有需要请在合作表单中注明。',
         },
       },
     },
@@ -170,7 +170,7 @@ export const dict = {
       success: {
         title: 'Submitted Successfully',
         desc: 'We have received your information and will reach out within 48 hours via the contact details you provided.',
-        next: 'Next up: Try the AI Investment Evaluation',
+        next: 'Next up: Try the Investment Evaluation',
       },
     },
     sidebar: {

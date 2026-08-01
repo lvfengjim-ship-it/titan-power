@@ -105,7 +105,7 @@ export default function ReportPanel({ type, report, onRetry }: Props) {
             <BrainCircuit className="h-16 w-16 text-volt-400" strokeWidth={1.2} />
             <p className="text-mist">{t('aitool.report.idle')}</p>
             <p className="font-mono text-xs tracking-[0.15em] text-dim">
-              DEEPSEEK-CHAT · STREAMING
+              DP-CHAT · STREAMING
             </p>
           </motion.div>
         ) : (

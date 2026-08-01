@@ -122,7 +122,7 @@ export default function AiTool() {
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
                 <span className="inline-block h-px w-6 bg-volt-400" />
-                AI Investment Analyzer
+                Investment Analyzer
               </motion.p>
               <motion.h1
                 className="mt-4 font-serif text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.15] text-paper"
@@ -146,7 +146,7 @@ export default function AiTool() {
               {[
                 <span key="ds" className="flex items-center gap-2 rounded-full border border-volt-400/40 bg-volt-400/10 px-4 py-1.5 font-mono text-[11px] tracking-[0.12em] text-volt-300">
                   <Sparkles className="h-3.5 w-3.5" />
-                  POWERED BY DEEPSEEK
+                  POWERED BY DP
                 </span>,
                 <span key="free" className="rounded-full bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-4 py-1.5 font-mono text-[11px] font-bold tracking-[0.12em] text-abyss">
                   FREE
@@ -194,7 +194,7 @@ export default function AiTool() {
       <section id="ai-report" className="scroll-mt-20 py-16">
         <div className="mx-auto mb-10 max-w-[1280px] px-6 lg:px-10">
           <SectionHeading
-            eyebrow="AI REPORT"
+            eyebrow="REPORT"
             eyebrowColor="volt"
             title={t('aitool.report.heading')}
             description={t('aitool.report.headingDesc')}
