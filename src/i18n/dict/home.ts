@@ -137,7 +137,7 @@ export const dict = {
   },
   en: {
     hero: {
-      title: 'Harness Sunlight · Capture Wind · Store the Future',
+      title: 'Harness the Sun, Catch the Wind, Power the Future',
       slogan: 'Make every kWh of green power worth investing in',
       lead: 'PT MOMENTUM focuses on the investment, M&A, and operation of PV, wind, and energy storage power plants, unlocking the value of distributed energy in China with capital and operational excellence.',
       ctaAi: 'Free Investment Evaluation',
