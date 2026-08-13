@@ -5,6 +5,11 @@
 	email admin@titan-power.cn
 	# 强制使用 Let's Encrypt 正式环境（默认若落入 staging，浏览器不信任）
 	acme_ca https://acme-v02.api.letsencrypt.org/directory
+	# 关闭 HTTP/3(QUIC)：部分运营商/路由器对 UDP 443 限速或丢弃，
+	# 浏览器会先尝试 QUIC 卡住数秒再回退 TCP，表现为"刷新很慢"
+	servers {
+		protocols h1 h2
+	}
 }
 
 www.titan-power.cn {
