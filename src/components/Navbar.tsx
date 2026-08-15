@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Menu, X, MessageSquare, PlaySquare } from 'lucide-react'
+import { Sparkles, Menu, X, MessageSquare, PlaySquare, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang, type Lang } from '@/i18n'
 
@@ -111,6 +111,14 @@ export default function Navbar() {
           <span className="hidden font-mono text-xs tracking-[0.08em] text-dim xl:block">
             TITAN-POWER.CN
           </span>
+          <a
+            href="/ops/"
+            title={t('common.nav.opsLogin')}
+            className="hidden items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-mist transition-all duration-300 hover:border-solar-400/60 hover:text-paper sm:flex"
+          >
+            <LogIn className="h-4 w-4" />
+            {t('common.nav.ops')}
+          </a>
           <Link
             to="/ai-tool"
             className="hidden items-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-5 py-2.5 text-sm font-bold text-abyss transition-all duration-300 hover:scale-[1.02] hover:glow-gold active:scale-[0.97] sm:flex"
@@ -176,6 +184,13 @@ export default function Navbar() {
               </nav>
               <div className="mt-auto flex flex-col gap-5">
                 <LangSwitch className="text-sm" />
+                <a
+                  href="/ops/"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-line px-5 py-3 text-sm font-medium text-paper transition-colors hover:border-solar-400/60"
+                >
+                  <LogIn className="h-4 w-4" />
+                  {t('common.nav.opsLogin')}
+                </a>
                 <Link
                   to="/ai-tool"
                   className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-solar-300 via-solar-400 to-solar-500 px-5 py-3 text-sm font-bold text-abyss"

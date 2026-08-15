@@ -32,5 +32,12 @@ titan-power.cn {
 	@html path / /index.html /about /business /ai-tool /insights /contact
 	header @html Cache-Control "no-cache"
 
+	# 智能运维模块（titan-ops，独立 compose 项目部署，容器名 titan-ops-app-1）
+	# 前提：docker network connect titan-ops_default titan-power-caddy-1（caddy 容器重建后需重连）
+	redir /ops /ops/ 308
+	handle_path /ops/* {
+		reverse_proxy titan-ops-app-1:3003
+	}
+
 	reverse_proxy app:3000
 }

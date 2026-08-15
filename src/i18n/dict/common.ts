@@ -10,6 +10,8 @@ export const dict = {
       business: '业务领域',
       insights: '前沿洞察',
       contact: '联系我们',
+      ops: '智能运维',
+      opsLogin: '智能运维系统登录',
     },
     cta: {
       aiTool: '投资评估',
@@ -73,6 +75,8 @@ export const dict = {
       business: 'Our Business',
       insights: 'Insights',
       contact: 'Contact Us',
+      ops: 'Smart O&M',
+      opsLogin: 'Smart O&M System Login',
     },
     cta: {
       aiTool: 'Investment Assessment',
