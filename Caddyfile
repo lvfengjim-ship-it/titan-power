@@ -32,12 +32,23 @@ titan-power.cn {
 	@html path / /index.html /about /business /ai-tool /insights /contact
 	header @html Cache-Control "no-cache"
 
-	# 智能运维模块（titan-ops，独立 compose 项目部署，容器名 titan-ops-app-1）
-	# 前提：docker network connect titan-ops_default titan-power-caddy-1（caddy 容器重建后需重连）
+	# ===== 智能运维系统（/ops/ 前缀，剥离后转发到 titan-ops 栈）=====
 	redir /ops /ops/ 308
 	handle_path /ops/* {
 		reverse_proxy titan-ops-app-1:3003
 	}
 
-	reverse_proxy app:3000
+	# 注意：必须用完整容器名。titan-ops 栈也有叫 app 的服务，
+	# caddy 同时接入多个网络时短名 app 会产生 DNS 歧义（曾导致主站 502）
+	reverse_proxy titan-power-app-1:3000
+}
+
+# ── 彭田新材料 ptm-zj.com：反代到共享 web 网络内的 ptm-zj-web 容器 ──
+# 前提：ptm-zj.com / www.ptm-zj.com 的 DNS A 记录已指向本服务器
+www.ptm-zj.com {
+	reverse_proxy ptm-zj-web:80
+}
+
+ptm-zj.com {
+	redir https://www.ptm-zj.com{uri} permanent
 }

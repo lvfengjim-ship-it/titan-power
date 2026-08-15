@@ -37,6 +37,9 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    networks:
+      - default
+      - web
     ports:
       - "80:80"
       - "443:443"
@@ -52,3 +55,9 @@ volumes:
   video-data:
   caddy-data:
   caddy-config:
+
+# 共享 web 网络：titan-ops、ptm-zj 等同机栈的容器挂在此网络，
+# 由本栈 Caddy 统一反代（/ops/、ptm-zj.com）
+networks:
+  web:
+    external: true
