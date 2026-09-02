@@ -108,6 +108,29 @@ export default function HeroSection() {
     return () => ctx.revert()
   }, [])
 
+  // 语言切换时标题文本变化：新渲染的字符 span 不在挂载时入场动画的目标集合里，
+  // 会永远停留在 opacity-0（曾导致英文长标题只显示前几个字符）。
+  // 标题变化后对全部字符重做一次入场动画；首次挂载跳过（由上面的主动画负责）。
+  const prevTitle = useRef(title)
+  useEffect(() => {
+    if (prevTitle.current === title) return
+    prevTitle.current = title
+    if (!root.current) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const ctx = gsap.context(() => {
+      if (reduced) {
+        gsap.set('.hero-char', { opacity: 1, y: 0, rotateX: 0 })
+        return
+      }
+      gsap.fromTo(
+        '.hero-char',
+        { y: 30, opacity: 0, rotateX: -20 },
+        { y: 0, opacity: 1, rotateX: 0, stagger: 0.04, duration: 0.6, ease: 'power2.out' },
+      )
+    }, root)
+    return () => ctx.revert()
+  }, [title])
+
   return (
     <section
       ref={root}
