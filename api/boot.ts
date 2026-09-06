@@ -13,6 +13,38 @@ const app = new Hono<{ Bindings: HttpBindings }>();
 
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 
+// ===== API 速率限制（安全审计 H-1 整改）=====
+// 公开官网无需登录，但接口不能被无限刷：联系表单严格限流（防垃圾提交），
+// 其余 API 宽松限流（防枚举/拖取）。内存固定窗口，单机部署足够。
+const rateBuckets = new Map<string, { n: number; reset: number }>();
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of rateBuckets) if (now > v.reset) rateBuckets.delete(k);
+}, 60_000).unref();
+
+function hitRateLimit(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  let b = rateBuckets.get(key);
+  if (!b || now > b.reset) {
+    b = { n: 0, reset: now + windowMs };
+    rateBuckets.set(key, b);
+  }
+  b.n++;
+  return b.n > limit;
+}
+
+app.use("/api/*", async (c, next) => {
+  const ip = c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  // 联系表单提交：每 IP 每分钟 5 次；其余 API：每 IP 每分钟 120 次
+  const limited = c.req.path.includes("contacts.submit")
+    ? hitRateLimit(`contact:${ip}`, 5, 60_000)
+    : hitRateLimit(`api:${ip}`, 120, 60_000);
+  if (limited) {
+    return c.json({ error: "请求过于频繁，请稍后再试" }, 429);
+  }
+  return next();
+});
+
 app.get("/api/health", (c) => c.json({ ok: true, ts: Date.now() }));
 app.post("/api/ai/report", aiReportHandler);
 // Mac 抓取端推送视频入库（Bearer INGEST_TOKEN 鉴权）

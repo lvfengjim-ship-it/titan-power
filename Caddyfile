@@ -32,6 +32,20 @@ titan-power.cn {
 	@html path / /index.html /about /business /ai-tool /insights /contact
 	header @html Cache-Control "no-cache"
 
+	# ===== 安全响应头（安全审计 H-2 整改）=====
+	# /ops/ 运维系统为独立应用，安全头由其自行配置，此处排除
+	# CSP 按本站实际依赖定制：Google Fonts 样式/字体、YouTube 嵌入、
+	# React/GSAP 内联样式（unsafe-inline 仅对 style 开放，script 不允许）
+	@mainSite not path /ops*
+	header @mainSite {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
 	# ===== 智能运维系统（/ops/ 前缀，剥离后转发到 titan-ops 栈）=====
 	redir /ops /ops/ 308
 	handle_path /ops/* {

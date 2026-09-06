@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, Globe, Sparkles } from 'lucide-react'
 import SectionHeading from '@/components/SectionHeading'
 import TagBadge from '@/components/TagBadge'
 import Reveal from '@/components/Reveal'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/i18n'
+import { trpc } from '@/providers/trpc'
+import { CATEGORY_LABEL, type InsightVideo } from '@/components/insights/data'
 
 interface VideoItem {
   id: string
@@ -12,16 +14,35 @@ interface VideoItem {
   channel: string
   date: string
   duration: string
-  category: '核能' | '氢能' | '储能' | '光伏'
+  category: string
   thumb: string
   aiSummary: string
 }
 
-const CATEGORY_TONE: Record<VideoItem['category'], 'nuclear' | 'hydrogen' | 'storage' | 'gold'> = {
+/** 后端行数据 → 首页卡片模型（与 /insights 页共用 tRPC 数据源，安全审计 M-3 整改） */
+function mapRow(v: InsightVideo): VideoItem {
+  const d = v.publishedAt ? new Date(v.publishedAt) : null
+  const m = Math.floor(v.durationSec / 60)
+  const s = v.durationSec % 60
+  return {
+    id: String(v.id),
+    title: v.aiTitle || v.title,
+    channel: v.channelTitle,
+    date: d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : '',
+    duration: `${m}:${String(s).padStart(2, '0')}`,
+    category: CATEGORY_LABEL[v.category] ?? v.category,
+    thumb: v.thumbnailUrl,
+    aiSummary: v.aiSummary ?? '',
+  }
+}
+
+const CATEGORY_TONE: Record<string, 'nuclear' | 'hydrogen' | 'storage' | 'gold' | 'volt'> = {
   核能: 'nuclear',
   氢能: 'hydrogen',
   储能: 'storage',
   光伏: 'gold',
+  风电: 'volt',
+  综合能源: 'volt',
 }
 
 const MOCK_VIDEOS: VideoItem[] = [
@@ -97,32 +118,21 @@ const MOCK_VIDEOS_EN_OVERRIDE: Record<string, Pick<VideoItem, 'title' | 'aiSumma
 
 export default function InsightsSection() {
   const { lang, t } = useLang()
-  const [videos, setVideos] = useState<VideoItem[] | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
+
+  // 统一走 tRPC videos.list（旧 REST /api/videos 已失效返回 404，曾导致此区域静默空白）
+  const { data, isLoading, isError } = trpc.videos.list.useQuery({ limit: 4 }, { retry: 1 })
+  const videos: VideoItem[] | null = isLoading
+    ? null
+    : !isError && data && data.length > 0
+      ? (data.slice(0, 4) as InsightVideo[]).map(mapRow)
+      : MOCK_VIDEOS
 
   const categoryLabel = (c: VideoItem['category']) => {
     const key = `home.insights.categories.${c}`
     const label = t(key)
     return label === key ? c : label
   }
-
-  useEffect(() => {
-    let cancelled = false
-    const timer = setTimeout(() => {
-      fetch('/api/videos')
-        .then((r) => (r.ok ? r.json() : Promise.reject(new Error('no api'))))
-        .then((data) => {
-          if (!cancelled) setVideos(Array.isArray(data) && data.length ? data.slice(0, 4) : MOCK_VIDEOS)
-        })
-        .catch(() => {
-          if (!cancelled) setVideos(MOCK_VIDEOS)
-        })
-    }, 700)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-    }
-  }, [])
 
   return (
     <section className="bg-ink-900 py-32">
@@ -188,7 +198,7 @@ export default function InsightsSection() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <TagBadge tone={CATEGORY_TONE[v.category]}>{categoryLabel(v.category)}</TagBadge>
+                  <TagBadge tone={CATEGORY_TONE[v.category] ?? 'volt'}>{categoryLabel(v.category)}</TagBadge>
                   <h3 className="mt-3 line-clamp-2 font-sans text-sm font-bold leading-snug text-paper">
                     {v.title}
                   </h3>
