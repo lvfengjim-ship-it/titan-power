@@ -112,11 +112,13 @@ export const dict = {
       },
     },
     insights: {
-      title: '全球能源前沿，每日为你解读',
+      title: '国内能源政策前沿，每日为你解读',
       description:
-        '我们的系统每日自动抓取海外核能、氢能、储能等领域的前沿技术视频，并由 AI 生成中文解读，免费开放给每一位行业同仁。',
+        '自动追踪国家能源局等官方渠道：光伏风电新政策、核电核准与安全监管、氢能储能新材料应用，政策一出，AI 辅助 48 小时内产出快评。',
       linkLabel: '进入前沿洞察',
-      note: '内容每日 08:00 自动更新 · 来源：国内公开媒体以及 Youtube 公开渠道 · AI 中文解读',
+      note: '自动扫描官方政策源 · 每 6 小时更新 · AI 快评仅供参考',
+      scanning: '政策扫描系统运行中，新快讯将自动出现在这里',
+      readMore: '查看快评',
       aiInsight: 'AI 解读',
       categories: {
         核能: '核能',
@@ -249,11 +251,13 @@ export const dict = {
       },
     },
     insights: {
-      title: 'Global Energy Frontiers, Interpreted Daily',
+      title: 'China Energy Policy Frontiers, Interpreted Daily',
       description:
-        'Our system automatically curates cutting-edge overseas videos on nuclear, hydrogen, energy storage, and more every day, with AI-generated Chinese interpretations open free of charge to every industry professional.',
+        'Auto-tracking official channels such as the National Energy Administration: new solar and wind policies, nuclear approvals and safety regulations, hydrogen and storage materials — AI-assisted commentary within 48 hours.',
       linkLabel: 'Explore Insights',
-      note: 'Auto-updated daily at 08:00 · Sources: domestic public media and public YouTube channels · AI Chinese interpretation',
+      note: 'Auto-scan of official policy sources · Every 6 hours · AI commentary for reference only',
+      scanning: 'Policy scanner is running — new briefings will appear here automatically',
+      readMore: 'Read Briefing',
       aiInsight: 'AI Insight',
       categories: {
         核能: 'Nuclear',

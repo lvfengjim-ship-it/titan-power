@@ -8,6 +8,13 @@
       "when": 1785258336360,
       "tag": "0000_fancy_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1789200000000,
+      "tag": "0001_sweet_insights",
+      "breakpoints": true
     }
   ]
 }

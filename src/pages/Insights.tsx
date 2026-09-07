@@ -8,6 +8,7 @@ import FilterBar from '@/components/insights/FilterBar'
 import type { SortKey } from '@/components/insights/FilterBar'
 import VideoCard from '@/components/insights/VideoCard'
 import VideoDetailDialog from '@/components/insights/VideoDetailDialog'
+import PolicyFeed from '@/components/insights/PolicyFeed'
 import GlossarySection from '@/components/insights/GlossarySection'
 import SubscribeSection from '@/components/insights/SubscribeSection'
 import { FALLBACK_VIDEOS } from '@/components/insights/data'
@@ -126,7 +127,7 @@ export default function Insights() {
         </motion.div>
 
         <span className="absolute left-6 top-20 font-mono text-[10px] tracking-[0.15em] text-dim lg:left-10">
-          AUTO-AGGREGATED · DAILY 08:00 CST
+          AUTO-AGGREGATED · EVERY 6H CST
         </span>
 
         <div className="relative mx-auto w-full max-w-[1280px] px-6 pb-12 lg:px-10">
@@ -193,7 +194,19 @@ export default function Insights() {
         </div>
       </section>
 
-      {/* Section 2 — 分类筛选 + 搜索工具条 */}
+      {/* Section 1.5 — 国内政策快讯（主要内容，自动扫描 + AI 快评） */}
+      <PolicyFeed />
+
+      {/* Section 2 — 海外视频区标题 + 分类筛选 + 搜索工具条 */}
+      <div className="mx-auto mt-20 max-w-[1280px] px-6 lg:px-10">
+        <p className="flex items-center gap-3 font-display text-xs font-medium uppercase tracking-[0.28em] text-volt-400">
+          <span className="inline-block h-px w-6 bg-volt-400" />
+          {t('insights.videos.eyebrow')}
+        </p>
+        <h2 className="mt-4 font-serif text-2xl font-bold text-paper lg:text-3xl">
+          {t('insights.videos.title')}
+        </h2>
+      </div>
       <FilterBar
         activeTab={activeTab}
         onTabChange={handleTabChange}

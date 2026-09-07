@@ -1,6 +1,7 @@
 import { createRouter, publicQuery } from "./middleware";
 import { videosRouter } from "./routers/videos";
 import { contactsRouter } from "./routers/contacts";
+import { insightsRouter } from "./routers/insights";
 
 // ===== 接口鉴权约定（2026-09 安全审计结论）=====
 // 本站是公开官网：videos/contacts 的数据本来就是公开展示与公开提交的，
@@ -13,6 +14,7 @@ export const appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
   videos: videosRouter,
   contacts: contactsRouter,
+  insights: insightsRouter,
 });
 
 export type AppRouter = typeof appRouter;

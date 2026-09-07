@@ -7,6 +7,7 @@ const STYLES: Record<string, string> = {
   storage: 'border-[#7A8CFF]/40 text-[#7A8CFF] bg-[#7A8CFF]/10',
   hydrogen: 'border-[#5EECD4]/40 text-[#5EECD4] bg-[#5EECD4]/10',
   nuclear: 'border-[#F2994A]/40 text-[#F2994A] bg-[#F2994A]/10',
+  paper: 'border-line-strong text-mist bg-paper/5',
 }
 
 interface Props {

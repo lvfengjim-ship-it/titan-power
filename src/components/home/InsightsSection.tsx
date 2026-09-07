@@ -1,145 +1,40 @@
-import { useState } from 'react'
-import { ChevronDown, Globe, Sparkles } from 'lucide-react'
+import { ArrowUpRight, Radar } from 'lucide-react'
+import { Link } from 'react-router'
 import SectionHeading from '@/components/SectionHeading'
 import TagBadge from '@/components/TagBadge'
 import Reveal from '@/components/Reveal'
-import { cn } from '@/lib/utils'
 import { useLang } from '@/i18n'
 import { trpc } from '@/providers/trpc'
-import { CATEGORY_LABEL, type InsightVideo } from '@/components/insights/data'
+import { CATEGORY_LABEL, CATEGORY_TONE } from '@/components/insights/data'
 
-interface VideoItem {
-  id: string
+interface PolicyItem {
+  id: number
+  sourceName: string
   title: string
-  channel: string
-  date: string
-  duration: string
   category: string
-  thumb: string
-  aiSummary: string
+  publishedAt: Date | string | null
+  viewpoint: string | null
 }
 
-/** 后端行数据 → 首页卡片模型（与 /insights 页共用 tRPC 数据源，安全审计 M-3 整改） */
-function mapRow(v: InsightVideo): VideoItem {
-  const d = v.publishedAt ? new Date(v.publishedAt) : null
-  const m = Math.floor(v.durationSec / 60)
-  const s = v.durationSec % 60
-  return {
-    id: String(v.id),
-    title: v.aiTitle || v.title,
-    channel: v.channelTitle,
-    date: d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : '',
-    duration: `${m}:${String(s).padStart(2, '0')}`,
-    category: CATEGORY_LABEL[v.category] ?? v.category,
-    thumb: v.thumbnailUrl,
-    aiSummary: v.aiSummary ?? '',
-  }
+function formatDate(d: Date | string | null): string {
+  if (!d) return ''
+  const dt = new Date(d)
+  return Number.isNaN(dt.getTime()) ? '' : dt.toISOString().slice(0, 10)
 }
 
-const CATEGORY_TONE: Record<string, 'nuclear' | 'hydrogen' | 'storage' | 'gold' | 'volt'> = {
-  核能: 'nuclear',
-  氢能: 'hydrogen',
-  储能: 'storage',
-  光伏: 'gold',
-  风电: 'volt',
-  综合能源: 'volt',
-}
-
-const MOCK_VIDEOS: VideoItem[] = [
-  {
-    id: 'v1',
-    title: '小型模块化反应堆（SMR）如何改变核电经济模型',
-    channel: 'Undecided with Matt Ferrell',
-    date: '2025-11-28',
-    duration: '14:32',
-    category: '核能',
-    thumb: '/insights-hero.jpg',
-    aiSummary:
-      'SMR 通过工厂预制与模块化部署大幅压缩建设周期与资本开支。视频拆解了 NuScale 与 Rolls-Royce SMR 的最新进展，并分析其对分布式电网的潜在影响。',
-  },
-  {
-    id: 'v2',
-    title: '绿氢电解槽成本五年下降 60% 的背后：技术路线全景',
-    channel: 'Just Have a Think',
-    date: '2025-11-26',
-    duration: '18:05',
-    category: '氢能',
-    thumb: '/ai-nebula.jpg',
-    aiSummary:
-      'PEM、碱性、SOEC 三条电解槽路线竞速，规模效应与催化剂降本是主线。视频对比了欧洲与中国厂商的成本曲线，绿氢平价时点或早于预期。',
-  },
-  {
-    id: 'v3',
-    title: '液流电池 vs 固态电池：长时储能的下一个十年',
-    channel: 'The Limiting Factor',
-    date: '2025-11-22',
-    duration: '22:47',
-    category: '储能',
-    thumb: '/business-storage.jpg',
-    aiSummary:
-      '4 小时以上长时储能需求爆发，液流电池在安全性与循环寿命上占优，固态电池则在能量密度上突破。视频给出两条路线的投资窗口判断。',
-  },
-  {
-    id: 'v4',
-    title: '钙钛矿叠层电池效率突破 34%：量产还有多远？',
-    channel: 'Undecided with Matt Ferrell',
-    date: '2025-11-18',
-    duration: '16:21',
-    category: '光伏',
-    thumb: '/business-pv.jpg',
-    aiSummary:
-      '钙钛矿/晶硅叠层实验室效率持续刷新，但稳定性与大面积一致性仍是量产瓶颈。视频梳理了 Oxford PV 与协鑫光电的中试进度。',
-  },
-]
-
-/** 英文版 mock 兜底数据（API 不可用时展示） */
-const MOCK_VIDEOS_EN_OVERRIDE: Record<string, Pick<VideoItem, 'title' | 'aiSummary'>> = {
-  v1: {
-    title: 'How Small Modular Reactors (SMRs) Are Changing the Economics of Nuclear Power',
-    aiSummary:
-      'SMRs sharply compress construction timelines and capex through factory prefabrication and modular deployment. The video breaks down the latest progress from NuScale and Rolls-Royce SMR, and analyzes their potential impact on distributed grids.',
-  },
-  v2: {
-    title: 'Behind the 60% Drop in Green Hydrogen Electrolyzer Costs: A Full Map of Technology Routes',
-    aiSummary:
-      'PEM, alkaline, and SOEC electrolyzer routes are racing ahead, with scale effects and catalyst cost reduction as the main drivers. The video compares the cost curves of European and Chinese manufacturers—green hydrogen parity may arrive earlier than expected.',
-  },
-  v3: {
-    title: 'Flow Batteries vs Solid-State Batteries: The Next Decade of Long-Duration Storage',
-    aiSummary:
-      'Demand for 4+ hour long-duration storage is surging. Flow batteries lead on safety and cycle life, while solid-state batteries are breaking through on energy density. The video assesses the investment window for both routes.',
-  },
-  v4: {
-    title: 'Perovskite Tandem Cells Break 34% Efficiency: How Far from Mass Production?',
-    aiSummary:
-      'Perovskite/silicon tandem lab efficiencies keep setting records, but stability and large-area uniformity remain mass-production bottlenecks. The video reviews pilot-line progress at Oxford PV and GCL Optoelectronics.',
-  },
-}
-
+/** 首页"前沿洞察"区：国内政策/项目快讯（自动扫描 + AI 快评）
+ *  无数据时显示诚实的"扫描中"占位——官网不展示虚构政策内容 */
 export default function InsightsSection() {
-  const { lang, t } = useLang()
-  const [openId, setOpenId] = useState<string | null>(null)
-
-  // 统一走 tRPC videos.list（旧 REST /api/videos 已失效返回 404，曾导致此区域静默空白）
-  const { data, isLoading, isError } = trpc.videos.list.useQuery({ limit: 4 }, { retry: 1 })
-  const videos: VideoItem[] | null = isLoading
-    ? null
-    : !isError && data && data.length > 0
-      ? (data.slice(0, 4) as InsightVideo[]).map(mapRow)
-      : MOCK_VIDEOS
-
-  const categoryLabel = (c: VideoItem['category']) => {
-    const key = `home.insights.categories.${c}`
-    const label = t(key)
-    return label === key ? c : label
-  }
+  const { t } = useLang()
+  const { data, isLoading, isError } = trpc.insights.list.useQuery({ limit: 4 }, { retry: 1 })
+  const items = (!isError && data ? (data as PolicyItem[]) : []).slice(0, 4)
 
   return (
     <section className="bg-ink-900 py-32">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <Reveal>
           <SectionHeading
-            eyebrow="Global Insights"
+            eyebrow="Policy Insights"
             eyebrowColor="volt"
             title={t('home.insights.title')}
             description={t('home.insights.description')}
@@ -150,86 +45,58 @@ export default function InsightsSection() {
 
         <Reveal delay={100}>
           <p className="mt-8 flex items-center gap-2 text-xs text-dim">
-            <Globe className="h-3.5 w-3.5" />
+            <Radar className="h-3.5 w-3.5 text-volt-400" />
             {t('home.insights.note')}
           </p>
         </Reveal>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {videos === null &&
+          {isLoading &&
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="overflow-hidden rounded-2xl border border-line bg-ink-800">
-                <div className="aspect-video animate-pulse bg-ink-700" />
-                <div className="space-y-3 p-5">
-                  <div className="h-3 w-16 animate-pulse rounded bg-ink-700" />
-                  <div className="h-4 w-full animate-pulse rounded bg-ink-700" />
-                  <div className="h-4 w-2/3 animate-pulse rounded bg-ink-700" />
-                </div>
+              <div key={i} className="space-y-3 rounded-2xl border border-line bg-ink-800 p-6">
+                <div className="h-3 w-16 animate-pulse rounded bg-ink-700" />
+                <div className="h-4 w-full animate-pulse rounded bg-ink-700" />
+                <div className="h-4 w-2/3 animate-pulse rounded bg-ink-700" />
+                <div className="h-20 animate-pulse rounded-xl bg-ink-850" />
               </div>
             ))}
 
-          {videos
-            ?.map((v) =>
-              lang === 'en' ? { ...v, ...(MOCK_VIDEOS_EN_OVERRIDE[v.id] ?? {}) } : v,
-            )
-            .map((v, i) => (
-            <Reveal key={v.id} delay={i * 100} y={32}>
-              <article className="group overflow-hidden rounded-2xl border border-line bg-ink-800 transition-all duration-500 hover:-translate-y-1.5 hover:border-line-strong">
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={v.thumb}
-                    alt={v.title}
-                    loading="lazy"
-                    onError={(e) => {
-                      ;(e.target as HTMLImageElement).src = '/video-fallback.jpg'
-                    }}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(5,8,15,0.6)]" />
-                  <span className="absolute bottom-2 right-2 rounded bg-abyss/80 px-1.5 py-0.5 font-mono text-[10px] text-paper">
-                    {v.duration}
-                  </span>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-12 w-12 scale-90 items-center justify-center rounded-full border border-white/30 bg-black/40 opacity-0 backdrop-blur transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
-                      <svg viewBox="0 0 24 24" className="ml-0.5 h-4 w-4 fill-white">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </span>
+          {!isLoading && items.length === 0 && (
+            <Reveal>
+              <div className="col-span-full flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line-strong py-16 text-center">
+                <Radar className="h-8 w-8 animate-pulse text-volt-400" />
+                <p className="text-sm text-mist">{t('home.insights.scanning')}</p>
+              </div>
+            </Reveal>
+          )}
+
+          {items.map((it, i) => (
+            <Reveal key={it.id} delay={i * 100} y={32}>
+              <Link to="/insights" className="group block h-full">
+                <article className="flex h-full flex-col rounded-2xl border border-line bg-ink-800 p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-line-strong">
+                  <div className="flex items-center gap-2">
+                    <TagBadge tone={CATEGORY_TONE[it.category] ?? 'volt'}>
+                      {CATEGORY_LABEL[it.category] ?? it.category}
+                    </TagBadge>
                   </div>
-                </div>
-                <div className="p-5">
-                  <TagBadge tone={CATEGORY_TONE[v.category] ?? 'volt'}>{categoryLabel(v.category)}</TagBadge>
                   <h3 className="mt-3 line-clamp-2 font-sans text-sm font-bold leading-snug text-paper">
-                    {v.title}
+                    {it.title}
                   </h3>
                   <p className="mt-2 text-xs text-dim">
-                    {v.channel} · {v.date}
+                    {it.sourceName}
+                    {formatDate(it.publishedAt) ? ` · ${formatDate(it.publishedAt)}` : ''}
                   </p>
-                  <button
-                    onClick={() => setOpenId(openId === v.id ? null : v.id)}
-                    className="mt-3 flex items-center gap-1.5 text-xs font-medium text-volt-400 transition-colors hover:text-volt-300"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    {t('home.insights.aiInsight')}
-                    <ChevronDown
-                      className={cn('h-3.5 w-3.5 transition-transform duration-300', openId === v.id && 'rotate-180')}
-                    />
-                  </button>
-                  <div
-                    className="grid transition-all"
-                    style={{
-                      gridTemplateRows: openId === v.id ? '1fr' : '0fr',
-                      transitionDuration: '350ms',
-                    }}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="mt-3 border-t border-line pt-3 text-xs leading-6 text-mist">
-                        {v.aiSummary}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  {it.viewpoint && (
+                    <p className="mt-3 line-clamp-4 flex-1 border-t border-line pt-3 text-xs leading-6 text-mist">
+                      {it.viewpoint}
+                    </p>
+                  )}
+                  <span className="mt-3 flex items-center gap-1 text-xs font-medium text-volt-400 transition-colors group-hover:text-volt-300">
+                    {t('home.insights.readMore')}
+                    <ArrowUpRight className="h-3 w-3" />
+                  </span>
+                </article>
+              </Link>
             </Reveal>
           ))}
         </div>

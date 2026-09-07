@@ -25,6 +25,19 @@ export const videos = mysqlTable("videos", {
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 });
 
+// 国内政策/项目快讯（自动扫描政策源 + DeepSeek 快评，全自动发布）
+export const insights = mysqlTable("insights", {
+  id: serial("id").primaryKey(),
+  sourceName: varchar("source_name", { length: 128 }).notNull().default(""),
+  sourceUrl: varchar("source_url", { length: 1024 }).notNull().unique(),
+  title: varchar("title", { length: 512 }).notNull(),
+  category: varchar("category", { length: 64 }).notNull().default("other"),
+  publishedAt: timestamp("published_at"),
+  viewpoint: text("viewpoint"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
+
 // 合作意向 / 留资（联系表单 + AI 工具登记）
 export const contacts = mysqlTable("contacts", {
   id: serial("id").primaryKey(),

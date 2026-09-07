@@ -27582,9 +27582,10 @@ var init_mysql_core = __esm({
 var schema_exports = {};
 __export(schema_exports, {
   contacts: () => contacts,
+  insights: () => insights,
   videos: () => videos
 });
-var videos, contacts;
+var videos, insights, contacts;
 var init_schema2 = __esm({
   "db/schema.ts"() {
     init_mysql_core();
@@ -27601,6 +27602,17 @@ var init_schema2 = __esm({
       aiTitle: varchar("ai_title", { length: 512 }).notNull().default(""),
       aiSummary: text("ai_summary"),
       aiContent: text("ai_content"),
+      createdAt: timestamp("created_at").notNull().defaultNow(),
+      updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
+    });
+    insights = mysqlTable("insights", {
+      id: serial("id").primaryKey(),
+      sourceName: varchar("source_name", { length: 128 }).notNull().default(""),
+      sourceUrl: varchar("source_url", { length: 1024 }).notNull().unique(),
+      title: varchar("title", { length: 512 }).notNull(),
+      category: varchar("category", { length: 64 }).notNull().default("other"),
+      publishedAt: timestamp("published_at"),
+      viewpoint: text("viewpoint"),
       createdAt: timestamp("created_at").notNull().defaultNow(),
       updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
     });
@@ -73675,11 +73687,52 @@ var contactsRouter = createRouter({
   })).mutation(({ input }) => createContact(input))
 });
 
+// api/queries/insights.ts
+init_drizzle_orm();
+init_connection();
+init_schema2();
+async function listInsights(opts) {
+  const db = getDb();
+  const conditions = [];
+  if (opts.category && opts.category !== "all") {
+    conditions.push(eq(insights.category, opts.category));
+  }
+  if (opts.search) {
+    const kw = `%${opts.search}%`;
+    conditions.push(or(like(insights.title, kw), like(insights.viewpoint, kw)));
+  }
+  const base = db.select().from(insights);
+  const rows = await (conditions.length ? base.where(conditions.length === 1 ? conditions[0] : sql`${sql.join(conditions, sql` AND `)}`) : base).orderBy(desc(insights.publishedAt)).limit(opts.limit ?? 30);
+  return rows;
+}
+async function insightExistsByUrl(sourceUrl) {
+  const db = getDb();
+  const rows = await db.select({ id: insights.id }).from(insights).where(eq(insights.sourceUrl, sourceUrl)).limit(1);
+  return rows.length > 0;
+}
+async function insertInsightIfNew(v) {
+  const db = getDb();
+  const existing = await db.select({ id: insights.id }).from(insights).where(eq(insights.sourceUrl, v.sourceUrl)).limit(1);
+  if (existing.length > 0) return false;
+  await db.insert(insights).values(v);
+  return true;
+}
+
+// api/routers/insights.ts
+var insightsRouter = createRouter({
+  list: publicQuery.input(external_exports.object({
+    category: external_exports.string().optional(),
+    search: external_exports.string().optional(),
+    limit: external_exports.number().min(1).max(100).optional()
+  }).optional()).query(({ input }) => listInsights(input ?? {}))
+});
+
 // api/router.ts
 var appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
   videos: videosRouter,
-  contacts: contactsRouter
+  contacts: contactsRouter,
+  insights: insightsRouter
 });
 
 // api/context.ts
@@ -74161,6 +74214,221 @@ async function videosIngestHandler(c) {
   return c.json({ ok: true, ingested, pruned, errors: errors.slice(0, 10) });
 }
 
+// api/insights/sources.ts
+var POLICY_SOURCES = [
+  {
+    name: "\u56FD\u5BB6\u80FD\u6E90\u5C40\xB7\u6700\u65B0\u6587\u4EF6",
+    listUrl: "https://www.nea.gov.cn/policy/zxwj.htm",
+    type: "cms-json"
+  },
+  {
+    name: "\u56FD\u5BB6\u80FD\u6E90\u5C40\xB7\u9879\u76EE\u6838\u51C6",
+    listUrl: "https://www.nea.gov.cn/policy/xmsp.htm",
+    type: "cms-json"
+  },
+  {
+    name: "\u56FD\u5BB6\u6838\u5B89\u5168\u5C40",
+    listUrl: "https://nnsa.mee.gov.cn/",
+    type: "html-links"
+  }
+];
+var CATEGORY_RULES = [
+  [/核安全|核安保|辐射安全|核设施安全|核材料管制/, "nuclear"],
+  [/核电|核准.*机组|机组.*核准|核电机组|小型堆|核反应堆/, "nuclear"],
+  [/光伏|太阳能|钙钛矿|硅片|组件|分布式发电/, "solar"],
+  [/风电|海上风电|陆上风电|风机|风能/, "wind"],
+  [/储能|液流电池|固态电池|钠离子|锂离子|锂电池|压缩空气|飞轮|抽水蓄能/, "storage"],
+  [/氢能|绿氢|电解槽|燃料电池|制氢|加氢站/, "hydrogen"],
+  [/新材料|复合材料|薄膜材料/, "other"]
+];
+function classifyTitle(title) {
+  for (const [re, cat] of CATEGORY_RULES) {
+    if (re.test(title)) return cat;
+  }
+  return null;
+}
+
+// api/insights/prompts.ts
+function getViewpointSystemPrompt() {
+  return `\u4F60\u662F\u4E00\u5BB6\u65B0\u80FD\u6E90\u6295\u8D44\u673A\u6784\uFF08\u5149\u4F0F/\u98CE\u7535/\u50A8\u80FD\u7535\u7AD9\u6295\u8D44\u3001\u5E76\u8D2D\u4E0E\u8FD0\u8425\uFF09\u7684\u884C\u4E1A\u5206\u6790\u5E08\uFF0C\u4E3A\u5B98\u7F51"\u524D\u6CBF\u6D1E\u5BDF"\u680F\u76EE\u64B0\u5199\u56FD\u5185\u653F\u7B56\u4E0E\u9879\u76EE\u5FEB\u8BC4\u3002
+
+\u8981\u6C42\uFF1A
+1. \u7BC7\u5E45 200-300 \u5B57\uFF08\u4E25\u683C\uFF09\uFF0C\u4E2D\u6587\uFF0C\u4E13\u4E1A\u3001\u514B\u5236\u3001\u6613\u8BFB\u3002
+2. \u7ED3\u6784\uFF1A\u5148\u7528\u4E00\u53E5\u8BDD\u6982\u62EC\u653F\u7B56/\u9879\u76EE\u6838\u5FC3\uFF1B\u518D\u5206\u6790\u5BF9\u65B0\u80FD\u6E90\u6295\u8D44\uFF08\u5149\u4F0F\u3001\u98CE\u7535\u3001\u6838\u7535\u3001\u50A8\u80FD\u3001\u6C22\u80FD\u65B9\u5411\uFF09\u7684\u5B9E\u9645\u5F71\u54CD\uFF1B\u6700\u540E\u63D0\u793A\u4E00\u4E2A\u503C\u5F97\u8DDF\u8E2A\u7684\u8981\u70B9\u3002
+3. \u4E8B\u5B9E\u53EA\u80FD\u6765\u81EA\u63D0\u4F9B\u7684\u539F\u6587\uFF0C\u7981\u6B62\u7F16\u9020\u6570\u636E\u3001\u65E5\u671F\u3001\u6587\u4EF6\u540D\u3001\u6570\u5B57\uFF1B\u539F\u6587\u6CA1\u6709\u7684\u4FE1\u606F\u4E0D\u8981\u865A\u6784\u3002
+4. \u4E0D\u51FA\u73B0"\u672C\u6587""\u8BE5\u6587"\u7B49\u5B57\u6837\uFF0C\u4E0D\u51FA\u73B0"\u4F5C\u4E3AAI"\u7B49\u81EA\u8FF0\uFF0C\u76F4\u63A5\u8F93\u51FA\u5FEB\u8BC4\u6B63\u6587\u3002
+5. \u4E0D\u505A\u4EFB\u4F55\u5F62\u5F0F\u7684\u6295\u8D44\u6536\u76CA\u627F\u8BFA\uFF0C\u4E0D\u4F7F\u7528"\u7A33\u8D5A""\u5FC5\u6DA8"\u7B49\u8FDD\u89C4\u8868\u8FF0\u3002
+6. \u82E5\u539F\u6587\u4E0E\u65B0\u80FD\u6E90\u884C\u4E1A\u65E0\u5173\uFF0C\u53EA\u8F93\u51FA\u4E24\u4E2A\u5B57\uFF1A\u65E0\u5173\u3002`;
+}
+function getViewpointUserPrompt(input) {
+  return `\u6765\u6E90\uFF1A${input.sourceName}
+\u53D1\u5E03\u65F6\u95F4\uFF1A${input.publishedAt}
+\u6807\u9898\uFF1A${input.title}
+
+\u539F\u6587\u8282\u9009\uFF1A
+${input.bodyText}
+
+\u8BF7\u8F93\u51FA 200-300 \u5B57\u5FEB\u8BC4\u3002`;
+}
+
+// api/insights/fetch.ts
+var UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+var FETCH_TIMEOUT = 15e3;
+var MAX_NEW_PER_RUN = 10;
+var MAX_AGE_DAYS = 30;
+async function fetchText(url2) {
+  const res = await fetch(url2, {
+    headers: { "User-Agent": UA },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT)
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buf = await res.arrayBuffer();
+  const head = Buffer.from(buf.slice(0, 2048)).toString("latin1");
+  const m = /charset=["']?([a-zA-Z0-9-]+)/i.exec(head);
+  let enc = (m?.[1] ?? "utf-8").toLowerCase();
+  if (enc === "gb2312" || enc === "gbk") enc = "gb18030";
+  try {
+    return new TextDecoder(enc).decode(buf);
+  } catch {
+    return new TextDecoder("utf-8").decode(buf);
+  }
+}
+function stripTags(s) {
+  return s.replace(/<[^>]+>/g, "").trim();
+}
+function htmlToText(html) {
+  return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&[a-zA-Z]+;/g, " ").replace(/\s+/g, " ").trim().slice(0, 4e3);
+}
+function parseDate(s) {
+  if (typeof s !== "string") return null;
+  const d = new Date(s.trim().replace(" ", "T"));
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+async function fetchCmsJsonItems(src) {
+  const html = await fetchText(src.listUrl);
+  const dir = src.listUrl.slice(0, src.listUrl.lastIndexOf("/") + 1);
+  const ids = [...new Set([...html.matchAll(/data="datasource:([a-f0-9]{32})"/g)].map((m) => m[1]))];
+  const preview = /preview="([a-zA-Z_]*)"/.exec(html)?.[1] || "ds_";
+  const items = [];
+  for (const id of ids) {
+    try {
+      const res = await fetch(`${dir}${preview}${id}.json`, {
+        headers: { "User-Agent": UA },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT)
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : data.datasource;
+      if (!Array.isArray(arr)) continue;
+      for (const raw2 of arr) {
+        const it = raw2;
+        const title = stripTags(String(it.showTitle ?? "")).trim();
+        const rawUrl = String(it.publishUrl ?? "");
+        if (!title || title.length < 8 || !rawUrl) continue;
+        let url2;
+        try {
+          url2 = new URL(rawUrl, src.listUrl).toString();
+        } catch {
+          continue;
+        }
+        items.push({ title, url: url2, publishedAt: parseDate(it.publishTime) });
+      }
+    } catch (e) {
+      console.warn(`[insights] ${src.name} ds=${id} \u83B7\u53D6\u5931\u8D25:`, e.message);
+    }
+  }
+  return items;
+}
+async function fetchHtmlLinkItems(src) {
+  const html = await fetchText(src.listUrl);
+  const items = [];
+  const re = /<a\s+[^>]*href="([^"]+)"[^>]*?(?:title="([^"]*)")?[^>]*>([\s\S]*?)<\/a>/gi;
+  for (const m of html.matchAll(re)) {
+    const [, href, titleAttr, inner] = m;
+    const title = (titleAttr || stripTags(inner)).trim();
+    if (!title || title.length < 10 || title.length > 120) continue;
+    if (!/\.s?html?/i.test(href)) continue;
+    let url2;
+    try {
+      url2 = new URL(href, src.listUrl).toString();
+    } catch {
+      continue;
+    }
+    items.push({ title, url: url2, publishedAt: null });
+  }
+  const seen = /* @__PURE__ */ new Set();
+  return items.filter((it) => seen.has(it.url) ? false : (seen.add(it.url), true));
+}
+async function processItem(src, it) {
+  const category = classifyTitle(it.title);
+  if (!category) return false;
+  if (await insightExistsByUrl(it.url)) return false;
+  const html = await fetchText(it.url);
+  const bodyText = htmlToText(html);
+  if (bodyText.length < 100) return false;
+  const viewpoint = await deepseekChat(
+    [
+      { role: "system", content: getViewpointSystemPrompt() },
+      {
+        role: "user",
+        content: getViewpointUserPrompt({
+          title: it.title,
+          sourceName: src.name,
+          publishedAt: it.publishedAt?.toISOString().slice(0, 10) ?? "",
+          bodyText
+        })
+      }
+    ],
+    700
+  );
+  if (!viewpoint || viewpoint.replace(/[\s。]/g, "") === "\u65E0\u5173") return false;
+  return insertInsightIfNew({
+    sourceName: src.name,
+    sourceUrl: it.url,
+    title: it.title.slice(0, 500),
+    category,
+    publishedAt: it.publishedAt,
+    viewpoint: viewpoint.slice(0, 2e3)
+  });
+}
+async function scanPolicies() {
+  if (!hasDeepSeekKey()) {
+    console.warn("[insights] \u672A\u914D\u7F6E DEEPSEEK_API_KEY\uFF0C\u8DF3\u8FC7\u653F\u7B56\u626B\u63CF");
+    return 0;
+  }
+  let created = 0;
+  for (const src of POLICY_SOURCES) {
+    if (created >= MAX_NEW_PER_RUN) break;
+    try {
+      const items = src.type === "cms-json" ? await fetchCmsJsonItems(src) : await fetchHtmlLinkItems(src);
+      const fresh = items.filter((it) => {
+        if (it.publishedAt && Date.now() - it.publishedAt.getTime() > MAX_AGE_DAYS * 864e5) return false;
+        return classifyTitle(it.title) !== null;
+      }).slice(0, 20);
+      for (const it of fresh) {
+        if (created >= MAX_NEW_PER_RUN) break;
+        try {
+          if (await processItem(src, it)) {
+            created++;
+            console.log(`[insights] \u65B0\u589E\u5FEB\u8BAF: ${it.title}`);
+          }
+        } catch (e) {
+          console.warn("[insights] \u6761\u76EE\u5904\u7406\u5931\u8D25:", it.url, e.message);
+        }
+      }
+    } catch (e) {
+      console.warn(`[insights] \u6E90 ${src.name} \u626B\u63CF\u5931\u8D25:`, e.message);
+    }
+  }
+  console.log(`[insights] \u626B\u63CF\u5B8C\u6210\uFF0C\u65B0\u589E ${created} \u6761`);
+  return created;
+}
+function scheduleInsightsFetch() {
+  const run2 = () => scanPolicies().catch((e) => console.warn("[insights] cron error:", e));
+  setTimeout(run2, 45e3);
+  setInterval(run2, 6 * 60 * 60 * 1e3);
+}
+
 // api/boot.ts
 var app = new Hono2();
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
@@ -74220,6 +74488,7 @@ if (env.isProduction) {
   } else {
     scheduleVideoFetch();
   }
+  scheduleInsightsFetch();
   const port = parseInt(process.env.PORT || "3000");
   serve2({ fetch: app.fetch, port }, () => {
     console.log(`Server running on http://localhost:${port}/`);

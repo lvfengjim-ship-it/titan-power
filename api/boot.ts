@@ -8,6 +8,7 @@ import { env } from "./lib/env";
 import { aiReportHandler } from "./ai/report";
 import { scheduleVideoFetch } from "./videos/fetch";
 import { videosIngestHandler } from "./videos/ingest";
+import { scheduleInsightsFetch } from "./insights/fetch";
 
 const app = new Hono<{ Bindings: HttpBindings }>();
 
@@ -88,6 +89,9 @@ if (env.isProduction) {
   } else {
     scheduleVideoFetch();
   }
+
+  // 国内政策快讯自动扫描（每 6 小时；政策源均为国内站点，服务器直连可达）
+  scheduleInsightsFetch();
 
   const port = parseInt(process.env.PORT || "3000");
   serve({ fetch: app.fetch, port }, () => {

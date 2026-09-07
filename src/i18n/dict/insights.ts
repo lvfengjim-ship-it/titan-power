@@ -1,17 +1,29 @@
 export const dict = {
   zh: {
     seo: {
-      title: '前沿技术洞察 — 核能·氢能·储能海外前沿视频 AI 解读 | 彭田环保',
-      desc: '每日自动聚合海外核能、氢能、储能、光伏、风电前沿技术视频，AI 中文解读，免费的行业技术普及平台。',
+      title: '前沿洞察 — 国内光伏风电核电政策快讯 AI 快评 | 彭田环保',
+      desc: '自动追踪国家能源局等官方渠道：光伏风电新政策、核电核准、核安全监管、氢能储能新材料应用，AI 辅助 48 小时内生成快评。',
     },
     hero: {
-      eyebrow: 'Global Energy Insights',
-      titleWords: '站在|全球|能源|技术|的|最前沿',
-      desc: '我们的系统每日自动抓取海外前沿技术视频——从小型模块化核反应堆到绿氢电解槽——并由 AI 生成中文解读，免费开放给每一位行业同仁。',
-      badgeLive: '每日 08:00 自动更新',
+      eyebrow: 'Energy Policy Insights',
+      titleWords: '站在|中国|能源|变革|的|最前沿',
+      desc: '我们聚焦国内能源脉动：光伏与风电新政、核电核准与安全监管、氢能与储能新材料应用——政策一出，AI 辅助 48 小时内产出快评，免费开放给每一位行业同仁。',
+      badgeLive: '每 6 小时自动扫描',
       badgeCached: '缓存数据 · 接口恢复后自动更新',
-      badgeSource: '来源：国内公开媒体以及 Youtube 公开渠道',
-      badgeAi: 'AI 解读：大模型',
+      badgeSource: '来源：国家能源局等官方渠道',
+      badgeAi: 'AI 快评：大模型辅助生成',
+    },
+    policy: {
+      eyebrow: 'Domestic Policy Radar',
+      title: '国内政策快讯',
+      desc: '自动追踪国家能源局、国家核安全局等官方渠道，聚焦光伏与风电新政策、新核准核电机组、核安全监管要求、氢能与储能新材料应用。',
+      note: '自动扫描 · 每 6 小时更新 · 快评由 AI 辅助生成，仅供参考',
+      empty: '暂无匹配快讯。系统自动扫描官方政策源，新内容将自动出现在这里。',
+      viewSource: '查看原文',
+    },
+    videos: {
+      eyebrow: 'Overseas Perspectives',
+      title: '海外视野 · 精选前沿视频',
     },
     filter: {
       categories: {
@@ -80,17 +92,29 @@ export const dict = {
   },
   en: {
     seo: {
-      title: 'Frontier Tech Insights — AI-Curated Overseas Videos on Nuclear, Hydrogen & Storage | PT Momentum',
-      desc: 'Daily auto-aggregated frontier technology videos on nuclear, hydrogen, storage, solar and wind, with AI-generated insights — a free industry education platform.',
+      title: 'Energy Insights — China Solar, Wind & Nuclear Policy Updates with AI Commentary | PT Momentum',
+      desc: 'Auto-tracking official channels such as the National Energy Administration: new solar and wind policies, nuclear approvals, nuclear safety regulations, hydrogen and storage materials — AI-assisted commentary within 48 hours.',
     },
     hero: {
-      eyebrow: 'Global Energy Insights',
-      titleWords: 'At the |Forefront |of Global |Energy |Technology',
-      desc: 'Our system automatically aggregates cutting-edge overseas tech videos every day — from small modular reactors to green hydrogen electrolyzers — and generates AI insights, free for every industry professional.',
-      badgeLive: 'Auto-updated daily at 08:00',
+      eyebrow: 'Energy Policy Insights',
+      titleWords: 'At the |Forefront |of China\'s |Energy |Transition',
+      desc: 'We track China\'s energy pulse: new solar and wind policies, nuclear approvals and safety regulations, hydrogen and storage material applications — AI-assisted commentary within 48 hours of release, free for every industry professional.',
+      badgeLive: 'Auto-scan every 6 hours',
       badgeCached: 'Cached data · Auto-syncs when the API recovers',
-      badgeSource: 'Source: domestic public media & public YouTube channels',
-      badgeAi: 'AI Insights: Large Language Model',
+      badgeSource: 'Sources: official channels incl. National Energy Administration',
+      badgeAi: 'AI Commentary: LLM-assisted',
+    },
+    policy: {
+      eyebrow: 'Domestic Policy Radar',
+      title: 'China Policy Briefing',
+      desc: 'Auto-tracking official channels such as the National Energy Administration and the National Nuclear Safety Administration: new solar and wind policies, newly approved nuclear units, nuclear safety regulations, and hydrogen/storage material applications.',
+      note: 'Auto-scan · Updated every 6 hours · AI-assisted commentary, for reference only',
+      empty: 'No matching briefings yet. Our system scans official policy sources automatically — new content will appear here.',
+      viewSource: 'View Source',
+    },
+    videos: {
+      eyebrow: 'Overseas Perspectives',
+      title: 'Global Views · Curated Frontier Videos',
     },
     filter: {
       categories: {
